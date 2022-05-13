@@ -1,6 +1,7 @@
 <?php
 
 include 'config.php';
+include 'admin/functions.php';
 
 session_start();
 
@@ -24,7 +25,7 @@ if(isset($_POST['submit'])){
       if($row['role'] == 'admin'){
 
          $_SESSION['admin_id'] = $row['id'];
-         header('location:dashboard.php');
+         header('location:admin/dashboard.php');
 
       }
     //   elseif($row['role'] == 'user'){
@@ -36,7 +37,7 @@ if(isset($_POST['submit'])){
       elseif($row['role'] == 'manager'){
 
         $_SESSION['user_id'] = $row['id'];
-        header('location:dashboard.php');
+        header('location:admin/dashboard.php');
 
      }else{
          $message[] = 'no user found!';
@@ -47,6 +48,72 @@ if(isset($_POST['submit'])){
    }
 
 }
+
+
+if(isset($_POST['submit'])){
+
+   
+
+   //getting the email
+   $email = escape($_POST['post_title']);
+
+   $pass = escape(md5($_POST['pass']));
+
+
+   //getting up some validations
+   if(empty($email)) {
+       $message[] = "Email Can not be empty";
+   } elseif (empty($pass)) {
+
+       $message[] = "Password Can not be empty";
+
+   } else {
+
+      //find user
+      $query = "SELECT * FROM user WHERE email = $email AND password = $pass ";
+      $get_user= mysqli_query($conn, $query);
+
+      if($get_user){
+
+         while($row = mysqli_fetch_assoc($get_user)) {
+            if($row['role'] == 'superadmin'){
+
+               $_SESSION['admin_id'] = $row['id'];
+               header('location:admin/dashboard.php');
+      
+            }
+      
+            elseif($row['role'] == 'admin'){
+
+               $_SESSION['admin_id'] = $row['id'];
+               header('location:admin/dashboard.php');
+      
+           }
+      
+            elseif($row['role'] == 'manager'){
+      
+              $_SESSION['user_id'] = $row['id'];
+              header('location:admin/dashboard.php');
+      
+           }
+           else{
+               $message[] = 'no user found!';
+            }
+         }
+
+      } else{
+         $message[] = 'incorrect email or password!';
+      }
+
+   }
+
+}
+   
+
+   
+ 
+
+
 
 ?>
 

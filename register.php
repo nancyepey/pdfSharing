@@ -58,6 +58,109 @@ if(isset($_POST['submit'])){
 
 }
 
+if(isset($_POST['submit'])) {
+
+   //getting fields
+   $name = escape($_POST['name']);
+
+   $email = escape($_POST['email']);
+
+   $pass = escape(md5($_POST['pass']));
+
+   $cpass = escape(md5($_POST['cpass']));
+
+
+   //getting up some validations
+   if(empty($name)) {
+       $message[] = "Name Can not be empty";
+   }elseif (empty($email)) {
+
+       $message[] = "Email Can not be empty";
+
+   }elseif (empty($pass)) {
+
+       $message[] = "Password Can not be empty";
+
+   }elseif (empty($cpass)) {
+
+       $message[] = "Confirm Can not be empty";
+
+   }elseif ($pass != $cpass) {
+
+      $message[] = "confirm password not matched!";
+
+   }else {
+
+
+       //getting media
+
+       //setting defaults
+       $file_image = '';
+
+
+       //getting the image
+       // File upload path
+       $targetDir_img = "./uploads/images/";
+       // $file_image = basename($_FILES["file"]["name"]);
+       // $file_image = basename($_FILES["image"]["name"]);
+       $file_image = basename(escape($_FILES['upload_image']['name']));
+       $targetFilePath_img = $targetDir_img . $file_image;
+       $fileType_img = pathinfo($targetFilePath_img,PATHINFO_EXTENSION);
+
+      //check if user alreay exist
+      $query_find_user = "SELECT * FROM users WHERE email = $email ";
+      $find_user = mysqli_query($conn, $query_find_user);
+      //did we find a user
+      if(mysqli_num_rows($find_user) > 1) {
+
+         $message[] = 'user already exist!';
+
+      } elseif(!empty($_FILES["upload_image"]["name"])) {
+           // Allow certain file formats IMAGES
+           $allowTypes_img = array('jpg','png','jpeg','gif','pdf');
+            //
+           if(in_array($fileType_img, $allowTypes_img)){
+               // Upload file to server
+               if(move_uploaded_file($_FILES["upload_image"]["tmp_name"], $targetFilePath_img)){
+
+                   //query to add post
+                   $query = "INSERT INTO users(username, name, email, password, role, image, created_on)";
+                   
+                   //for date we are not sending a value but we are sending a function
+                   $query .= "VALUES('{$username}' ,'{$name}', '{$email}','{$password}', '{$post_status}', '{$post_updated_on}')";
+                   
+                   //sending the query to the database
+                   $create_user_query = mysqli_query($conn, $query);
+
+                   confirmQuery($create_user_query);
+
+                   //getting the id
+                   $user_id = mysqli_insert_id($conn);
+
+
+                   if($create_user_query){
+                       // $message[] = "The file ".$file_image. " has been uploaded successfully.";
+                       $message[] = "<p class='bg-primary' style='text-align:center;'> <span style='text-transform:capitalize; color:orange;'>{$username}</span> Post was Created Sucessfully. <a href='../user_profile.php?p_id={$user_id}' target='_blank' style='text-transform:capitalize; color:orange;'>View Post</a> or <a href='#' target='_blank' style='text-transform:capitalize; color:orange;'> User Profile</a></p>";
+                       
+                   }else{
+                       $message[] = "File upload failed, please try again.";
+                   } 
+               }else{
+                   $message[] = "Sorry, there was an error uploading your file.";
+               }
+           }else{
+               $message[] = 'Sorry, only JPG, JPEG, PNG, GIF, & PDF files are allowed to upload.';
+           }
+      }
+
+   }
+   
+
+
+ 
+
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -100,7 +203,7 @@ if(isset($_POST['submit'])){
       <input type="email" required placeholder="enter your email" class="box" name="email">
       <input type="password" required placeholder="enter your password" class="box" name="pass">
       <input type="password" required placeholder="confirm your password" class="box" name="cpass">
-      <input type="file" name="image" required class="box" accept="image/jpg, image/png, image/jpeg">
+      <input type="file" name="upload_image" required class="box" accept="image/jpg, image/png, image/jpeg">
       <p>already have an account? <a href="login.php">login now</a></p>
       <input type="submit" value="register now" class="btn" name="submit">
    </form>
