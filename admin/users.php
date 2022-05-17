@@ -6,59 +6,160 @@ include_once 'functions.php';
 session_start();
 
 // $admin_id = $_SESSION['admin_id'];
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['id'];
 
 if(!isset($user_id)){
    header('location:../login.php');
 }
 
-if(isset($_POST['adduser'])){
 
-    $name = $_POST['name'];
-    $name = filter_var($name, FILTER_SANITIZE_STRING);
-    $username = $_POST['uname'];
-    $username = filter_var($username, FILTER_SANITIZE_STRING);
-    $email = $_POST['email'];
-    $email = filter_var($email, FILTER_SANITIZE_STRING);
-    $pass = md5($_POST['pass']);
-    $pass = filter_var($pass, FILTER_SANITIZE_STRING);
-    $cpass = md5($_POST['cpass']);
-    $cpass = filter_var($cpass, FILTER_SANITIZE_STRING);
-    $role = $_POST['role'];
-    $role = filter_var($role, FILTER_SANITIZE_STRING);
- 
-    
-    //getting media
-    $image = $_FILES['upload_image']['name'];
-    $image_tmp_name = $_FILES['upload_image']['tmp_name'];
-    $image_size = $_FILES['upload_image']['size'];
-    $image_folder = 'uploaded_img/'.$image;
-   
- 
-    $updatedon = date('d-m-y h:i:s'); //date time
- 
-    $select = $conn->prepare("SELECT * FROM `users` WHERE email = ?");
-    $select->execute([$email]);
- 
-    if($select->rowCount() > 0){
-       $message[] = 'user already exist!';
-    }else{
-       if($pass != $cpass){
-          $message[] = 'confirm password not matched!';
-       }elseif($image_size > 2000000){
-          $message[] = 'image size is too large!';
-       }else{
-          $insert = $conn->prepare("INSERT INTO `users`(username, name, email, password, role, image, created_on) VALUES(?,?,?,?,?,?,?)");
-          $insert->execute([$username,$name, $email, $cpass, $role, $image, $updatedon]);
-          if($insert){
-             move_uploaded_file($image_tmp_name, $image_folder);
-             $message[] = 'User created succesfully!';
-             
+
+ if(isset($_POST['adduser'])) {
+
+  //getting the name
+  $name = escape($_POST['name']);
+
+  //getting the username
+  $username = escape($_POST['uname']);
+
+  //getting the email
+  $email = escape($_POST['email']);
+
+  //getting the password
+  $pass = md5(escape($_POST['pass']));
+
+  //getting the confirm password
+  $cpass = md5(escape($_POST['cpass']));
+
+  //getting the role
+  $role = escape($_POST['role']);
+
+  //getting the state status
+  $user_status = intval(escape($_POST['status']));
+
+  //assigning the date() fxn to the user date variable and passing the format or assigning the format d-m-y
+  //$user_created_on = date('d-m-y');
+  //$user_updated_on = date('d-m-y');
+
+
+  //for datetime
+  date_default_timezone_set("Africa/Douala"); //to specify time with respect to my zone
+  $CurrentTime =time(); //current time in seconds
+  //strftime is string format time
+  //$DateTime = strftime("%Y-%m-%d %H:%M:%S",$CurrentTime); //mostly use when we have to apply sql format
+  $DateTime = strftime("%B-%d-%Y %H:%M:%S",$CurrentTime); 
+  $user_created_on = $DateTime;
+  $user_updated_on = $DateTime;
+
+  //checking if the user exist
+  // $check_user_query = "SELECT * FROM users WHERE username = $username ";
+  // $check_user = mysqli_query($conn, $check_user_query);
+  //Get the number of rows in the result set
+  // $user_exist = mysqli_num_rows($check_user);
+  //
+  $check_user = mysqli_query($conn, "SELECT * FROM users WHERE username = '".$_POST['uname']."'");
+  // if(mysqli_num_rows($check_user)) {
+  //     exit('This username already exists');
+  // }
+
+
+  //getting up some validations
+  if(empty($name)) {
+      $message[] = "Name Can not be empty";
+  }elseif (empty($username)) {
+
+      $message[] = "Username Can not be empty";
+
+  }elseif (empty($email)) {
+
+      $message[] = "Email Can not be empty";
+
+  }elseif (empty($pass)) {
+
+    $message[] = "Password Can not be empty";
+
+  }elseif (empty($cpass)) {
+
+    $message[] = "Confirm Password Can not be empty";
+
+  }elseif (empty($role)) {
+
+      $message[] = "Role Can not be empty";
+
+  }elseif (empty($user_status)) {
+
+    $message[] = "Status Can not be empty";
+
+  }elseif ($pass != $cpass) {
+
+    $message[] = "confirm password not matched!";
+
+  }elseif (mysqli_num_rows($check_user)) {
+
+  $message[] = "User Already Exist!";
+
+  }else {
+
+
+      //getting media
+
+      //setting defaults
+      $file_image = '';
+
+
+      //getting the image
+      // File upload path
+      $targetDir_img = "../uploads/images/";
+      // $file_image = basename($_FILES["file"]["name"]);
+      // $file_image = basename($_FILES["image"]["name"]);
+      $file_image = basename(escape($_FILES['upload_image']['name']));
+      $targetFilePath_img = $targetDir_img . $file_image;
+      $fileType_img = pathinfo($targetFilePath_img,PATHINFO_EXTENSION);
+
+      if(!empty($_FILES["upload_image"]["name"])) {
+          // Allow certain file formats IMAGES
+          $allowTypes_img = array('jpg','png','jpeg','gif');
+           //
+          if(in_array($fileType_img, $allowTypes_img)){
+              // Upload file to server
+              if(move_uploaded_file($_FILES["upload_image"]["tmp_name"], $targetFilePath_img)){
+
+                  //query to add post
+                  $query = "INSERT INTO users(username, name, email, password, role, image, active, updated_on)";
+                  
+                  //for date we are not sending a value but we are sending a function
+                  $query .= "VALUES('{$name}' ,'{$username}', '{$email}','{$cpass}', '{$role}', '{$file_image}','{$user_status}', '{$user_updated_on}')";
+                  
+                  //sending the query to the database
+                  $create_user_query = mysqli_query($conn, $query);
+
+                  confirmQuery($create_user_query);
+
+                  //getting the id
+                  $user_id = mysqli_insert_id($conn);
+
+
+                  if($create_user_query){
+                      // $message[] = "The file ".$file_image. " has been uploaded successfully.";
+                      $message[] = "<p class='bg-primary' style='text-align:center;'> <span style='text-transform:capitalize; color:orange;'>{$name}</span> User was Created Sucessfully.</p>";
+                      
+                  }else{
+                      $message[] = "File upload failed, please try again.";
+                  } 
+              }else{
+                  $message[] = "Sorry, there was an error uploading your file.";
+              }
+          }else{
+              $message[] = 'Sorry, only JPG, JPEG, PNG, GIF, & PDF files are allowed to upload.';
           }
-       }
-    }
- 
- }
+      }
+
+  }
+  
+
+
+}
+
 
 ?>
 
@@ -196,20 +297,34 @@ if(isset($_POST['adduser'])){
                 <div class="form-group">
                   <label for="image">Upload Profile Pic</label>
                   <div class="custom-file">
-                    <input type="file" name="upload_image" class="custom-file-input" id="image" required>
+                    <input type="file" name="upload_image" class="custom-file-input" id="image" name="upload_image" required>
                     <label for="image" class="custom-file-label">Choose File</label>
                   </div>
                   <small class="form-text text-muted">Max Size 3mb</small>
 	            </div>
-                <div class="mb-3">
+                <div class="mb-3 mt-2">
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select" aria-label="Default select example" name="role" id="role">
                         <option selected>Select Role</option>
-                        <option value="1">Administrator</option>
-                        <option value="2">Manager</option>
-                        <option value="3">Writer</option>
-                        <option value="3">Translator</option>
+                        <option value="admin">Administrator</option>
+                        <option value="manager">Manager</option>
+                        <option value="writer">Writer</option>
+                        <option value="translator">Translator</option>
                     </select>
+                </div>
+                <!-- <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" aria-label="Default select example" name="status" id="status">
+                        <option selected>Select</option>
+                        <option value="1">Active</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div> -->
+                <div class="mb-3 form-check">
+                  <input type="hidden" name="status" value="0">
+                  <input type="checkbox" class="form-check-input" id="status" name="status" value="1">
+                  
+                  <label class="form-check-label" for="status">Active</label>
                 </div>
              
             </div>
@@ -230,9 +345,12 @@ if(isset($_POST['adduser'])){
         <?php
 
         //PDO
-        $get_users = $conn->prepare("SELECT * FROM `users`");
-        $get_users->execute();
-        $fetch_users = $get_users->fetch(PDO::FETCH_ASSOC);
+        // $get_users = $conn->prepare("SELECT * FROM `users`");
+        // $get_users->execute();
+        // $fetch_users = $get_users->fetch(PDO::FETCH_ASSOC);
+
+        $get_users_query = "SELECT * FROM users ";
+        $get_users = mysqli_query($conn, $get_users_query);
 
         ?>
           
@@ -247,6 +365,7 @@ if(isset($_POST['adduser'])){
               <th scope="col">Email</th>
               <th scope="col">Role</th>
               <th scope="col">Date</th>
+              <th scope="col">Status</th>
               <th scope="col">Edit</th>
               <th scope="col">Delete</th>
             </tr>
@@ -258,13 +377,21 @@ if(isset($_POST['adduser'])){
             
 
             //get size of the fetch result
-            $count = $get_users->rowCount();
+            //$count = $get_users->rowCount();
             // echo $get_users->rowCount();
             $i = 1;
-            for($i = 1; $i < ($count +1);  $i++) {
+            //we need to values using a while loop
+            while($row = mysqli_fetch_assoc($get_users)) {
 
-                
-            }
+              //users table
+              $user_id            = $row['id'];
+              $user_uname         = $row['username'];
+              $user_name          = $row['name'];
+              $user_email         = $row['email'];
+              $user_role          = $row['role'];
+              $user_image         = $row['image'];
+              $user_status         = $row['active'];
+              $user_date          = $row['created_on'];
 
 
             ?>
@@ -273,13 +400,28 @@ if(isset($_POST['adduser'])){
               <td><?php echo $i; ?></td>
               <td>
                   
-                  <img src="../uploads/images/<?= $fetch_users['image']; ?>" class="rounded-circle" alt="Profile Image" width="25" height="25">
+                  <img src="../uploads/images/<?= $user_image; ?>" class="rounded-circle" alt="Profile Image" width="25" height="25">
                 </td>
-              <td><?= $fetch_users['username']; ?></td>
-              <td><?= $fetch_users['name']; ?></td>
-              <td><?= $fetch_users['email']; ?></td>
-              <td><?= $fetch_users['role']; ?></td>
-              <td><?= $fetch_users['created_on']; ?></td>
+              <td><?= $user_uname; ?></td>
+              <td><?= $user_name; ?></td>
+              <td><?= $user_email; ?></td>
+              <td><?= $user_role; ?></td>
+              <td><?= $user_date; ?></td>
+              <td>
+              
+                
+                <?php
+
+                  if ($user_status) {
+                    echo '<i class="fa-solid fa-check" style="color:red;"></i>';
+                  } else {
+                    echo '<i class="fa-solid fa-xmark" style="color:green;"></i>';
+                  }
+                 
+
+                ?>
+                
+              </td>
               <td>
                 <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#editusermodal">
                     <i class="fas fa-edit"></i>
@@ -291,7 +433,10 @@ if(isset($_POST['adduser'])){
                   </button>
               </td>
 
-              <?php //} ?>
+              <?php 
+                $i++;
+                } 
+              ?>
             </tr>
             
           </tbody>
@@ -313,29 +458,39 @@ if(isset($_POST['adduser'])){
               
                 <div class="mb-3">
                   <label for="uname" class="form-label">Username</label>
-                  <input type="text" class="form-control" id="uname" placeholder="" value="<?= $fetch_users['username']; ?>" required>
+                  <input type="text" class="form-control" id="uname" placeholder="" value="<?= $user_uname; ?>" required>
                 </div>
                 <div class="mb-3">
                   <label for="name" class="form-label">Name</label>
-                  <input type="text" class="form-control" id="name" placeholder="" value="<?= $fetch_users['name']; ?>" required>
+                  <input type="text" class="form-control" id="name" placeholder="" value="<?= $user_name; ?>" required>
                 </div>
                 <div class="form-group">
                   <label for="image">Old Profile Pic</label>
                   <div class="custom-file">
-                    <input type="hidden" name="old_image" value="<?= $fetch_users['image']; ?>">
+                    <input type="hidden" name="old_image" value="<?= $user_image; ?>">
                     <input type="file" name="upload_image" class="custom-file-input" accept="image/jpg, image/jpeg, image/png">
                   </div>
 	              </div>
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select" aria-label="Default select example" id="role" disabled>
-                        <option selected><?= $fetch_users['role']; ?></option>
+                        <option selected><?= $user_role; ?></option>
                         <option value="1">Administrator</option>
                         <option value="2">Manager</option>
                         <option value="3">Writer</option>
                         <option value="3">Translator</option>
                     </select>
                 </div>
+                <div class="mb-3 form-check">
+                  <input type="hidden" name="status" value="0">
+                  <input type="checkbox" class="form-check-input" id="status" name="status"  value="1" >
+                  
+                  <label class="form-check-label" for="status">Active</label>
+                </div>
+                <!-- <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+                  <label class="form-check-label" for="flexSwitchCheckDefault">Active</label>
+                </div> -->
              
             </div>
             <div class="modal-footer">
@@ -358,13 +513,13 @@ if(isset($_POST['adduser'])){
                     <!-- form -->
                     <form action="post">
                     <div class="modal-header">
-                    <h5 class="modal-title" id="deleteusermodalLabel">Delete <?= $fetch_users['username']; ?></h5>
+                    <h5 class="modal-title" id="deleteusermodalLabel">Delete <?= $user_uname; ?></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                     
                         <div class="mb-3">
-                            <label for="uname" class="form-label">Are you show you want to delete <?= $fetch_users['username']; ?></label>
+                            <label for="uname" class="form-label">Are you show you want to delete user "<?= $user_uname; ?>"</label>
                         </div>
                     
                     </div>
@@ -376,7 +531,7 @@ if(isset($_POST['adduser'])){
 
                     </form>
                 </div>
-                </div>
+             </div>
             </div>
       <!-- DELETE User Modal END-->
 
