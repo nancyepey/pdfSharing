@@ -26,6 +26,12 @@
             </a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="../admin/articles.php">
+              
+              Articles
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="#">
               
               Views
