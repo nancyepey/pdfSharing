@@ -128,7 +128,7 @@ if(!isset($user_id)){
                   $query = "INSERT INTO users(username, name, email, password, role, image, active, updated_on)";
                   
                   //for date we are not sending a value but we are sending a function
-                  $query .= "VALUES('{$name}' ,'{$username}', '{$email}','{$cpass}', '{$role}', '{$file_image}','{$user_status}', '{$user_updated_on}')";
+                  $query .= "VALUES('{$username}' ,'{$name}', '{$email}','{$cpass}', '{$role}', '{$file_image}','{$user_status}', '{$user_updated_on}')";
                   
                   //sending the query to the database
                   $create_user_query = mysqli_query($conn, $query);
@@ -210,18 +210,7 @@ if(!isset($user_id)){
 
   
     
-  <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Company name</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-    <div class="navbar-nav">
-      <div class="nav-item text-nowrap">
-        <a class="nav-link px-3" href="../logout.php">Sign out</a>
-      </div>
-    </div>
-  </header>
+  <?php include '../includes/header.php'; ?>
 
   <?php include '../includes/hnav.php'; ?>
 

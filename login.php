@@ -123,6 +123,7 @@ function ifItIsMethod($method) {
 
 }
 
+
 //this function is to redirect user to any location set in
 function redirect($location) {
 
