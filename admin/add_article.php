@@ -1,15 +1,21 @@
 <?php
 
-include '../config.php';
+include_once '../config.php';
+include_once 'functions.php';
 
 session_start();
 
 // $admin_id = $_SESSION['admin_id'];
 $user_id = $_SESSION['id'];
+$username = $_SESSION['username'];
 
 if(!isset($user_id)){
    header('location:../login.php');
 }
+
+
+
+
 
 ?>
 
@@ -99,6 +105,98 @@ if(!isset($user_id)){
   <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       
   <div class="container" style="margin-right: 40px;">
+
+    <?php
+        
+if(isset($_POST['add_article'])) {
+    // 
+    // defining variables
+    $thumbnailpic = escape($_POST['thumbnail']);
+    $title_en = escape($_POST['title']);
+    $title_fr = escape($_POST['titlefr']);
+    $content_fr = escape($_POST['content']);
+    $content_en = escape($_POST['contentFR']);
+    $short_desc_fr = escape($_POST['short_desc']);
+    $short_desc_en = escape($_POST['short_descfr']);
+    $state = escape($_POST['status']);
+    $validated = 0;
+    $author = $username;
+    $translator = "";
+
+    //for datetime
+    date_default_timezone_set("Africa/Douala"); //to specify time with respect to my zone
+    $CurrentTime =time(); //current time in seconds
+    //strftime is string format time
+    //$DateTime = strftime("%Y-%m-%d %H:%M:%S",$CurrentTime); //mostly use when we have to apply sql format
+    $DateTime = strftime("%B-%d-%Y %H:%M:%S",$CurrentTime); 
+    $created_on = $DateTime;
+    $updated_on = $DateTime;
+
+    //getting up some validations
+    if (empty($title_en)) {
+
+        $message[] = "Title (EN) Can not be empty";
+
+    }elseif (empty($title_fr)) {
+
+        $message[] = "Title (FR) Can not be empty";
+
+    }elseif (empty($content_fr)) {
+
+        $message[] = "Content (FR) Can not be empty";
+
+    }elseif (empty($content_en)) {
+
+        $message[] = "Content (EN) Can not be empty";
+
+    }elseif (empty($short_desc_fr)) {
+
+        $message[] = "Short Description (FR) Can not be empty";
+
+    }elseif (empty($short_desc_en)) {
+
+        $message[] = "Short Description (EN) Can not be empty";
+
+    }elseif (empty($state)) {
+
+        $message[] = "Status Can not be empty";
+
+    }elseif (empty($author)) {
+
+        $message[] = "Author Can not be empty";
+
+    } else {
+        //
+        $file_image = '';
+
+
+        //getting the image
+        // File upload path
+        $targetDir_img = "../uploads/images/";
+        // $file_image = basename($_FILES["file"]["name"]);
+        // $file_image = basename($_FILES["image"]["name"]);
+        $file_image = basename(escape($_FILES['upload_image']['name']));
+        $targetFilePath_img = $targetDir_img . $file_image;
+        $fileType_img = pathinfo($targetFilePath_img,PATHINFO_EXTENSION);
+        
+    }
+
+}
+
+        $thumbnailpic = "<script>document.getElementByID('thmpic').value</script>";
+
+        if(isset($message)){
+            foreach($message as $message){
+                echo '
+                <div class="message">
+                    <span>'.$message.'</span>
+                    <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+                </div>
+                ';
+            }
+        }
+    ?>
+
     <h4>Add News</h4>
     
     <section>
@@ -106,6 +204,7 @@ if(!isset($user_id)){
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
+                    <form action="" method="post" enctype="multipart/form-data">
 
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <!-- tabs head -->
@@ -130,7 +229,7 @@ if(!isset($user_id)){
                                 <!-- tab 1 -->
                                 <div class="tab-pane fade show active" id="addN" role="tabpanel" aria-labelledby="addN-tab">
                                     
-                                    <form action="" method="post">
+                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
                                         <!-- add news config -->
                                         <div class="mb-3">
                                             <label for="thumb" class="form-label">Thumbnail</label>
@@ -139,24 +238,24 @@ if(!isset($user_id)){
                                                 <header>Drag & Drop to Upload Image</header>
                                                 <!-- <span>OR</span> -->
                                                 <button hidden>Browse File</button>
-                                                <input type="file" name="thumbnail" hidden>
+                                                <input type="file" name="thumbnail" id="thmpic" hidden>
                                             </div>
                                         </div>
 
                                         <!-- save tab 1 btn -->
-                                        <div class="mb-3">
-                                            <input type="submit" name="saveThumb" value="Save" id="saveThumb" class="btn btn-success">
-                                        </div>
-                                    </form>
+                                        <!-- <div class="mb-3">
+                                            <input type="submit" name="saveThumb" onclick="savefile();" value="Save" id="saveThumb" class="btn btn-success">
+                                        </div> -->
+                                    <!-- </form> -->
                                 </div>
                                 <!-- tab 2 -->
                                 <div class="tab-pane fade" id="enN" role="tabpanel" aria-labelledby="enN-tab">
                                     <!-- En -->
-                                    <form action="" method="post">
+                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
 
                                         <div class="mb-3">
                                             <label for="title" class="form-label">Title</label>
-                                            <input type="text" class="form-control" id="title" aria-describedby="titleHelp">
+                                            <input type="text" class="form-control" id="title" name="title" aria-describedby="titleHelp">
                                             <div id="titleHelp" class="form-text">Write a captivating title.</div>
                                         </div>                        
                                         <div class="mb-3">
@@ -172,27 +271,27 @@ if(!isset($user_id)){
                                             
                                         </div>
                                         <!-- save tab 2 btn -->
-                                        <div class="mb-3">
+                                        <!-- <div class="mb-3">
                                             <input type="submit" name="saveEn" value="Save(EN)" id="saveEn" class="btn btn-success">
-                                        </div>
+                                        </div> -->
                                         <!-- end en form -->
-                                    </form>
+                                    <!-- </form> -->
                                 </div>
                                 <!-- tab 3 -->
                                 <div class="tab-pane fade" id="frN" role="tabpanel" aria-labelledby="frN-tab">
                                     <!-- Fr -->
-                                    <form action="" method="post">
+                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
 
                                         <div class="mb-3">
-                                            <label for="title" class="form-label">Titre</label>
-                                            <input type="text" class="form-control" id="title" aria-describedby="titleHelp">
-                                            <div id="titleHelp" class="form-text">Rédiger un titre captivant.</div>
+                                            <label for="titlefr" class="form-label">Titre</label>
+                                            <input type="text" class="form-control" id="titlefr" aria-describedby="titlefrHelp">
+                                            <div id="titlefrHelp" class="form-text">Rédiger un titre captivant.</div>
                                         </div>                        
                                         <div class="mb-3">
-                                            <label for="short_desc" class="form-label">Description sommaire</label>
-                                            <textarea class="form-control" name="short_desc" id="short_desc" cols="20" rows="4" aria-describedby="short_descHelp"></textarea>
+                                            <label for="short_descfr" class="form-label">Description sommaire</label>
+                                            <textarea class="form-control" name="short_descfr" id="short_descfr" cols="20" rows="4" aria-describedby="short_descfrHelp"></textarea>
                                             
-                                            <div id="short_descHelp" class="form-text">Pas plus de 100 mots.</div>
+                                            <div id="short_descfrHelp" class="form-text">Pas plus de 100 mots.</div>
                                         </div>                        
                                         <div class="mb-3">
                                             <label for="contentFR" class="form-label">Contenu</label>
@@ -201,24 +300,24 @@ if(!isset($user_id)){
                                             <!-- <div id="contentFRHelp" class="form-text">.</div> -->
                                         </div>
                                         <!-- save tab 2 btn -->
-                                        <div class="mb-3">
+                                        <!-- <div class="mb-3">
                                             <input type="submit" name="saveEn" value="Save(FR)" id="saveEn" class="btn btn-success">
-                                        </div>
+                                        </div> -->
                                         <!-- end en form -->
-                                    </form>
+                                    <!-- </form> -->
                                 </div>
                                 <!-- tab 4 -->
                                 <div class="tab-pane fade" id="confN" role="tabpanel" aria-labelledby="confN-tab">
                                     
                                     <!-- config -->
-                                    <form action="" method="post">
+                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
 
                                         <div class="mb-3">
                                             <div class="col-auto">
                                                 <label for="status" class="col-form-label">Status</label>
                                             </div>
                                             <div class="col-auto">
-                                                <select class="form-select form-select-sm " id="status" name="name" aria-label=".form-select-sm example">
+                                                <select class="form-select form-select-sm " id="status" name="status" aria-label=".form-select-sm example">
                                                     <option selected>Select Status</option>
                                                     <option value="published">Published</option>
                                                     <option value="unpublished">Unpublished</option>
@@ -250,7 +349,7 @@ if(!isset($user_id)){
                                         </div>
                                         <!-- save tab 2 btn -->
                                         <div class="mb-3">
-                                            <input type="submit" name="saveCfg" value="Save Config" id="saveCfg" class="btn btn-success">
+                                            <input type="submit" name="add_article" value="Add Article" id="saveCfg" class="btn btn-success">
                                         </div>
                                         <!-- end en form -->
                                     </form>
@@ -301,6 +400,7 @@ if(!isset($user_id)){
     button = dropArea.querySelector("button"),
     input = dropArea.querySelector("input");
     let file; //this is a global variable and we'll use it inside multiple functions
+    let filenamestr;
 
     button.onclick = ()=>{
     input.click(); //if user click on the button then the input also clicked
@@ -335,19 +435,26 @@ if(!isset($user_id)){
         file = event.dataTransfer.files[0];
         showFile(); //calling function
     });
+  
 
     function showFile(){
         alert("inside show file!");
         let fileType = file.type; //getting selected file type
         let validExtensions = ["image/jpeg", "image/jpg", "image/png"]; //adding some valid image extensions in array
+        console.log(file);
+        console.log(fileType);
+        filenamestr = file.name;
+        
         if(validExtensions.includes(fileType)){ //if user selected file is an image file
             let fileReader = new FileReader(); //creating new FileReader object
             fileReader.onload = ()=>{
             let fileURL = fileReader.result; //passing user file source in fileURL variable
-                // UNCOMMENT THIS BELOW LINE. I GOT AN ERROR WHILE UPLOADING THIS POST SO I COMMENTED IT
+            
+            // UNCOMMENT THIS BELOW LINE. I GOT AN ERROR WHILE UPLOADING THIS POST SO I COMMENTED IT
             let imgTag = `<img src="${fileURL}" height="100px" alt="image">`; //creating an img tag and passing user selected file source inside src attribute
             dropArea.innerHTML = imgTag; //adding that created img tag inside dropArea container
             }
+           
             fileReader.readAsDataURL(file);
         }else{
             alert("This is not an Image File!");
@@ -355,6 +462,25 @@ if(!isset($user_id)){
             dragText.textContent = "Drag & Drop to Upload File";
         }
     }
+
+    // function saveFile(){
+        
+    //     let validExtensions = ["image/jpeg", "image/jpg", "image/png"]; //adding some valid image extensions in array
+    //     let fileType = file.type; //getting selected file type
+        
+    //     if(validExtensions.includes(fileType)){ //if user selected file is an image file
+            
+            
+    //         $filename = time().'_'.$_FILES['file']['name'];
+  
+    //         move_uploaded_file($_FILES['file']['tmp_name'], 'uploads/images'.$filename);
+            
+    //         // echo 'uploads/images'.$filename;
+    //         alert('uploads/images'.$filename);
+    //     }else{
+    //         alert("An Error occured!");
+    //     }
+    // }
 
 </script>
 
