@@ -1,14 +1,64 @@
 <?php
 
 include '../config.php';
+include_once 'functions.php';
 
 session_start();
 
 // $admin_id = $_SESSION['admin_id'];
 $user_id = $_SESSION['id'];
+$username = $_SESSION['username'];
 
 if(!isset($user_id)){
    header('location:../login.php');
+}
+
+$showgroup = "";
+
+if(isset($_POST['addcat'])) {
+
+  // get fields
+  $group = escape($_POST['group']);
+  $year = escape($_POST['year']);
+  $author = $username;
+  $name = strval($year). ' '. $group;
+  //for datetime
+  date_default_timezone_set("Africa/Douala"); //to specify time with respect to my zone
+  $CurrentTime =time(); //current time in seconds
+  //strftime is string format time
+  //$DateTime = strftime("%Y-%m-%d %H:%M:%S",$CurrentTime); //mostly use when we have to apply sql format
+  $DateTime = strftime("%B-%d-%Y %H:%M:%S",$CurrentTime); 
+  $created_on = $DateTime;
+  $updated_on = $DateTime;
+
+  //getting up some validations
+  if(empty($group)) {
+    $message[] = "Group Can not be empty";
+  } elseif (empty($year)) {
+
+    $message[] = "year Can not be empty";
+
+  } elseif ($author == '') {
+    $message[] = "Author Can not be empty";
+  } elseif ($name == '') {
+    $message[] = "Name Can not be empty";
+
+  } else {
+
+    // $message[] =  $group. ' '. $year. ' '. $author. ' '.$name. ' '.$created_on. ' '. $updated_on;
+
+    // creating the query
+    $query = "INSERT INTO category(name, groupe, year, createdby, created_on, updated_on) VALUES('$name' ,'$group', '$year', '$author', '$created_on', '$updated_on')";
+    //sending the query to the database
+    $create_cat_query = mysqli_query($conn, $query);
+    confirmQuery($create_cat_query);
+    if($create_cat_query) {
+      $message[] = "Category created successfully";
+    } else {
+      $message[] = "Please try again an error occured!";
+    }
+  }
+
 }
 
 ?>
@@ -21,37 +71,68 @@ if(!isset($user_id)){
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
-    <title>Dashboard Template · Bootstrap v5.0</title>
+    <title>PDF</title>
 
-    
-    
 
     <!-- Bootstrap core CSS -->
     <link href="../css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-    </style> -->
-
-
 
     
     <!-- Custom styles for this template -->
     <link href="../css/dashboard.css" rel="stylesheet">
 
-    <!-- chart js -->
+    <style>
+      * {box-sizing: border-box}
+      body {font-family: "Lato", sans-serif;}
+
+      /* Style the tab */
+      .tab {
+        float: left;
+        /* background-color: #f1f1f1; */
+        width: 30%;
+        height: 100px;
+      }
+
+      .heading {
+        /* background-color: #f1f1f1; */
+        padding: 5px;
+      }
+
+      /* Style the buttons inside the tab */
+      .tab button {
+        display: block;
+        background-color: inherit;
+        color: black;
+        padding: 12px 16px;
+        width: 100%;
+        border: none;
+        outline: none;
+        text-align: left;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 17px;
+      }
+
+      /* Change background color of buttons on hover */
+      .tab button:hover {
+        background-color: #ddd;
+      }
+
+      /* Create an active/current "tab button" class */
+      .tab button.active {
+        background-color: #ccc;
+        /* background-color: #00BFFF; */
+      }
+
+      /* Style the tab content */
+      .tabcontent {
+        float: left;
+        padding: 0px 12px;
+        width: 70%;
+        border-left: none;
+        height: 300px;
+      }
+    </style>
    
 
   </head>
@@ -66,6 +147,18 @@ if(!isset($user_id)){
   <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       
   <div class="container" style="margin-right: 40px;">
+    <?php
+      if(isset($message)){
+          foreach($message as $message){
+              echo '
+              <div class="message">
+                  <span>'.$message.'</span>
+                  <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+              </div>
+              ';
+          }
+      }
+    ?>
     <h2>PDFS</h2>
     <!-- <div class="buttons">
     <a class='btn btn-primary' href='#' target='_blank'>+</a>
@@ -73,10 +166,14 @@ if(!isset($user_id)){
     <!-- Trigger the modal with a button -->
       <!-- Button trigger modal -->
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
-        +
+        + PDF
       </button>
 
-      <!-- Modal -->
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addcatmodal">
+        + Category
+      </button>
+
+      <!-- Add PDF Modal -->
       <div class="modal fade" id="addpdfmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addpdfmodalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -86,7 +183,7 @@ if(!isset($user_id)){
             </div>
             <div class="modal-body">
               <!-- form -->
-              <form action="post">
+              <form method="post">
                 <div class="mb-3">
                   <label for="name" class="form-label">Title</label>
                   <input type="text" class="form-control" id="name" placeholder="">
@@ -117,39 +214,119 @@ if(!isset($user_id)){
         </div>
       </div>
 
-      <div class="table-responsive">
-        <table class="table table-striped table-sm">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Image</th>
-              <th scope="col">Name</th>
-              <th scope="col">Description</th>
-              <th scope="col">Author</th>
-              <th scope="col">Category</th>
-              <th scope="col">Date</th>
-              <th scope="col">View</th>
-              <th scope="col">Edit</th>
-              <th scope="col">Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-            
-          </tbody>
-        </table>
+      <!-- Add category Modal -->
+      <div class="modal fade" id="addcatmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addcatmodalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addcatmodalLabel">Add Category</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- form -->
+            <form method="post">
+              <div class="modal-body">
+                <!-- group -->
+                <div class="row g-3 align-items-center mb-2">
+                  <div class="col-auto">
+                    <label for="inputgroup" class="col-form-label">Group</label>
+                  </div>
+                  <div class="col-auto">
+                    <select class="form-select form-control" name="group" aria-label="Default select example">
+                      <option selected>Select Group</option>
+                      <option value="white oils price structure">White Oils Price Structure</option>
+                      <option value="structure des prix produits blanc">Structure des prix produits blanc</option>
+                    </select>
+                  </div>
+                  <!-- <div class="col-auto">
+                    <span id="passwordHelpInline" class="form-text">
+                      Must be 8-20 characters long.
+                    </span>
+                  </div> -->
+                </div>
+                <!-- year -->
+                <div class="row g-3 align-items-center mb-2">
+                  <div class="col-auto ">
+                    <label for="inputyear" class="col-form-label" style="padding-right: 10px;">Year</label>
+                  </div>
+                  <div class="col-auto">
+                    <input type="number" id="inputyear" name="year" class="form-control" aria-describedby="yearHelpInline">
+                  </div>
+                  
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" value="Add Category" class="btn btn-primary" name="addcat">
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
+
+      
+ </div>
+
+ <!-- display -->
+ <div class="container" style="margin-right: 40px; margin-top: 20px;">
+
+   <div class="cat">
+          <?php
+
+          // getting the categories
+          $get_cats_query = "SELECT * FROM category ";
+          $get_cats = mysqli_query($conn, $get_cats_query);
+          $i = 1;
+          while($row = mysqli_fetch_assoc($get_cats)) {
+            // category table
+            $cat_id = $row['id'];
+            $cat_name = $row['name'];
+            $cat_group = $row['groupe'];
+            $cat_year = $row['year'];
+            $cat_createdby = $row['createdby'];
+            $cat_createdon = $row['created_on'];
+            $cat_updatedon = $row['updated_on'];
+
+            if($cat_group == "white oils price structure") {
+              $showgroup = "<h6>EN PDF</h6>";
+            } elseif($cat_group == "structure des prix produits blanc") {
+              $showgroup = "<h6>FR PDF</h6>";
+            }
+
+          
+          ?>
+     <div class="tab">
+        <div class="heading">
+    
+          <!-- <h6>EN PDF</h6> -->
+
+          <!-- table category and pdf -->
+            <?php
+              
+            ?>
+          <h6><?= $showgroup; ?></h6>
+        </div>
+        <!-- <button class="tablinks" onclick="openCity(event, 'London')" id="defaultOpen">london</button> -->
+        <button class="tablinks" onclick="openCity(event, '<?= $cat_name; ?>')"><?= $cat_name; ?></button>
+      </div>
+      
+      <div id="<?= $cat_name; ?>" class="tabcontent">
+        <h3>London</h3>
+        <p>London is the capital city of England.</p>
+        <p><?= $cat_year; ?></p>
+      </div>
+
+      <!-- <div id="Paris" class="tabcontent">
+        <h3>Paris</h3>
+        <p>Paris is the capital of France.</p> 
+      </div>
+
+      <div id="Tokyo" class="tabcontent">
+        <h3>Tokyo</h3>
+        <p>Tokyo is the capital of Japan.</p>
+      </div> -->
+      <?php } ?>
+    </div>
+
  </div>
 
 
@@ -159,7 +336,24 @@ if(!isset($user_id)){
  
 
 
+  <script>
+    function openCity(evt, cityName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(cityName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
 
+    // Get the element with id="defaultOpen" and click on it
+    document.getElementById("defaultOpen").click();
+  </script>
    
 
 

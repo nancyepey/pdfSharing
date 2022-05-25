@@ -127,7 +127,7 @@ if(!isset($user_id)){
                   //query to add post
                   $query = "INSERT INTO users(username, name, email, password, role, image, active, updated_on)";
                   
-                  //for date we are not sending a value but we are sending a function
+                  //sending a value 
                   $query .= "VALUES('{$username}' ,'{$name}', '{$email}','{$cpass}', '{$role}', '{$file_image}','{$user_status}', '{$user_updated_on}')";
                   
                   //sending the query to the database
