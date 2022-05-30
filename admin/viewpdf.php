@@ -82,56 +82,43 @@ if(isset($_POST['addcat'])) {
     <link href="../css/dashboard.css" rel="stylesheet">
 
     <style>
-      * {box-sizing: border-box}
-      body {font-family: "Lato", sans-serif;}
 
-      /* Style the tab */
-      .tab {
-        float: left;
-        /* background-color: #f1f1f1; */
-        width: 30%;
-        height: 100px;
+      .wrapper{
+        width: 130px;
+        background: #fff;
+        border-radius: 5px;
+        padding: 30px;
+        /* box-shadow: 7px 7px 12px rgba(0,0,0,0.05); */
       }
-
-      .heading {
-        /* background-color: #f1f1f1; */
+      .pdfsharegrid {
+        display: grid;
+        grid-template-columns: auto auto;
+      }
+      .griditem {
         padding: 5px;
+        margin-top: 10px;
       }
-
-      /* Style the buttons inside the tab */
-      .tab button {
-        display: block;
-        background-color: inherit;
-        color: black;
-        padding: 12px 16px;
-        width: 100%;
-        border: none;
-        outline: none;
-        text-align: left;
+      .wrapper form{
+        height: 20px;
+        display: flex;
         cursor: pointer;
-        transition: 0.3s;
-        font-size: 17px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        border-radius: 5px;
+        border: 2px dashed #6990F2;
+      }
+      form :where(i, button){
+        color: #6990F2;
+      }
+      form i{
+        font-size: 50px;
+      }
+      form button{
+        margin-top: 2px;
+        font-size: 16px;
       }
 
-      /* Change background color of buttons on hover */
-      .tab button:hover {
-        background-color: #ddd;
-      }
-
-      /* Create an active/current "tab button" class */
-      .tab button.active {
-        background-color: #ccc;
-        /* background-color: #00BFFF; */
-      }
-
-      /* Style the tab content */
-      .tabcontent {
-        float: left;
-        padding: 0px 12px;
-        width: 70%;
-        border-left: none;
-        height: 300px;
-      }
     </style>
    
 
@@ -165,9 +152,7 @@ if(isset($_POST['addcat'])) {
     </div> -->
     <!-- Trigger the modal with a button -->
       <!-- Button trigger modal -->
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
-        + PDF
-      </button>
+      
 
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addcatmodal">
         + Category
@@ -184,25 +169,44 @@ if(isset($_POST['addcat'])) {
             <div class="modal-body">
               <!-- form -->
               <form method="post">
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                   <label for="name" class="form-label">Title</label>
                   <input type="text" class="form-control" id="name" placeholder="">
-                </div>
-                <div class="form-group">
-                  <label for="image">Upload Image</label>
+                </div> -->
+                <div class="form-group mb-2">
+                  <label for="file">Upload PDF</label>
                   <div class="custom-file">
-                    <input type="file" name="upload_image" class="custom-file-input" id="image">
-                    <label for="image" class="custom-file-label">Choose File</label>
+                    <input type="file" name="upload_file" class="custom-file-input" id="file">
+                    <label for="file" class="custom-file-label">Choose File</label>
                   </div>
-                  <small class="form-text text-muted">Max Size 3mb</small>
 	              </div>
                 <div class="mb-3">
-                  <label for="category" class="form-label">Category</label>
-                  <input type="text" class="form-control" id="category" placeholder="">
+                  <div class="col-auto">
+                    <label for="inputcategory" class="col-form-label">Category</label>
+                  </div>
+                  <div class="col-auto">
+                    <select class="form-select form-control" name="category" aria-label="category select">
+                      <option selected>Select Category</option>
+                      <?php
+                      // getting the categories
+                      $get_catss_query = "SELECT * FROM category ";
+                      $get_catss = mysqli_query($conn, $get_catss_query);
+                      while($row = mysqli_fetch_assoc($get_catss)) {
+                        // getting row values
+                        $ct_id = $row['id'];
+                        $ct_name = $row['name'];
+                      // }
+
+                      ?>
+                      <option value="<?= $ct_id; ?>"><?= $ct_name; ?></option>
+                      <!-- <option value="structure des prix produits blanc">Structure des prix produits blanc</option> -->
+                      <?php } ?>
+                    </select>
+                  </div>
                 </div>
                 <div class="mb-3">
                   <label for="description" class="form-label">Description</label>
-                  <textarea class="form-control" id="description" rows="3"></textarea>
+                  <textarea class="form-control" id="description" rows="2"></textarea>
                 </div>
               </form>
             </div>
@@ -268,63 +272,78 @@ if(isset($_POST['addcat'])) {
 
  <!-- display -->
  <div class="container" style="margin-right: 40px; margin-top: 20px;">
-
-   <div class="cat">
-          <?php
-
-          // getting the categories
-          $get_cats_query = "SELECT * FROM category ";
-          $get_cats = mysqli_query($conn, $get_cats_query);
-          $i = 1;
-          while($row = mysqli_fetch_assoc($get_cats)) {
-            // category table
-            $cat_id = $row['id'];
-            $cat_name = $row['name'];
-            $cat_group = $row['groupe'];
-            $cat_year = $row['year'];
-            $cat_createdby = $row['createdby'];
-            $cat_createdon = $row['created_on'];
-            $cat_updatedon = $row['updated_on'];
-
-            if($cat_group == "white oils price structure") {
-              $showgroup = "<h6>EN PDF</h6>";
-            } elseif($cat_group == "structure des prix produits blanc") {
-              $showgroup = "<h6>FR PDF</h6>";
-            }
-
+  
+  <div class="pdfsharegrid">
+    <!--  -->
+    <div class="griditem">
+      <!-- contains the ategories -->
+      <ul class="nav flex-column mt-3">
+         <?php
+        
+                  // getting the categories
+                  $get_cats_query = "SELECT * FROM category ";
+                  $get_cats = mysqli_query($conn, $get_cats_query);
+                  $i = 1;
+                  while($row = mysqli_fetch_assoc($get_cats)) {
+                    // category table
+                    $cat_id = $row['id'];
+                    $cat_name = $row['name'];
+                    $cat_group = $row['groupe'];
+                    $cat_year = $row['year'];
+                    $cat_createdby = $row['createdby'];
+                    $cat_createdon = $row['created_on'];
+                    $cat_updatedon = $row['updated_on'];
+        
+                    if($cat_group == "white oils price structure") {
+                      $showgroup = "<h6>EN PDF</h6>";
+                    } elseif($cat_group == "structure des prix produits blanc") {
+                      $showgroup = "<h6>FR PDF</h6>";
+                    }
+        
+                  
+                  ?>
           
-          ?>
-     <div class="tab">
-        <div class="heading">
-    
-          <!-- <h6>EN PDF</h6> -->
+        
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="?cat_id=<?= $cat_id; ?>"><?= $cat_name; ?></a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li> -->
+          <?php } ?>
+        </ul>
+     </div>
+     <div class="griditem">
+       <!-- pdfs -->
+       <div class="row">
 
-          <!-- table category and pdf -->
-            <?php
+         <?php
+            //loop thro different months
+            $months = [
+              "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+            ];
+            foreach ($months as $month) {
+  
+            
+         ?>
+         <div class="wrapper">
+            <form action="#">
+              <input class="file-input" type="file" name="file" hidden>
+              <i class="fas fa-cloud-upload-alt"></i>
               
-            ?>
-          <h6><?= $showgroup; ?></h6>
-        </div>
-        <!-- <button class="tablinks" onclick="openCity(event, 'London')" id="defaultOpen">london</button> -->
-        <button class="tablinks" onclick="openCity(event, '<?= $cat_name; ?>')"><?= $cat_name; ?></button>
-      </div>
-      
-      <div id="<?= $cat_name; ?>" class="tabcontent">
-        <h3>London</h3>
-        <p>London is the capital city of England.</p>
-        <p><?= $cat_year; ?></p>
-      </div>
+              <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
+              <?php echo $month; ?>
+              </button>
+            </form>
+          </div>
+          <?php } ?>
 
-      <!-- <div id="Paris" class="tabcontent">
-        <h3>Paris</h3>
-        <p>Paris is the capital of France.</p> 
-      </div>
-
-      <div id="Tokyo" class="tabcontent">
-        <h3>Tokyo</h3>
-        <p>Tokyo is the capital of Japan.</p>
-      </div> -->
-      <?php } ?>
+       </div>
+       <!-- end months -->
+     </div>
     </div>
 
  </div>
@@ -337,6 +356,7 @@ if(isset($_POST['addcat'])) {
 
 
   <script>
+
     function openCity(evt, cityName) {
       var i, tabcontent, tablinks;
       tabcontent = document.getElementsByClassName("tabcontent");
@@ -353,6 +373,7 @@ if(isset($_POST['addcat'])) {
 
     // Get the element with id="defaultOpen" and click on it
     document.getElementById("defaultOpen").click();
+
   </script>
    
 
