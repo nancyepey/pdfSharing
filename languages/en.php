@@ -23,6 +23,7 @@
 		"hpsf investments and partners" => "hpsf investments and partners",
 		"hpsf" => "hpsf",
 		"HPSF" => "HPSF",
+		"Dashboard" => "Dashboard",
 		"online tax filing" => "online tax filing",
 		"distribution chain" => "distribution chain",
 		"hpsf investment map" => "hpsf investment map",

@@ -140,7 +140,7 @@ if(isset($_POST['addcat'])) {
               echo '
               <div class="message">
                   <span>'.$message.'</span>
-                  <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+                  <i class="fas fa-times" style="color:red;" onclick="this.parentElement.remove();"></i>
               </div>
               ';
           }
@@ -278,48 +278,102 @@ if(isset($_POST['addcat'])) {
     <div class="griditem">
       <!-- contains the ategories -->
       <ul class="nav flex-column mt-3">
+      <?php
+
+        ?>
+        <li class="nav-item">
+          <a class="nav-link" style="font-size:larger;" href="#">white oils price structure</a>
+        </li>
          <?php
         
-                  // getting the categories
-                  $get_cats_query = "SELECT * FROM category ";
-                  $get_cats = mysqli_query($conn, $get_cats_query);
-                  $i = 1;
-                  while($row = mysqli_fetch_assoc($get_cats)) {
-                    // category table
-                    $cat_id = $row['id'];
-                    $cat_name = $row['name'];
-                    $cat_group = $row['groupe'];
-                    $cat_year = $row['year'];
-                    $cat_createdby = $row['createdby'];
-                    $cat_createdon = $row['created_on'];
-                    $cat_updatedon = $row['updated_on'];
-        
-                    if($cat_group == "white oils price structure") {
-                      $showgroup = "<h6>EN PDF</h6>";
-                    } elseif($cat_group == "structure des prix produits blanc") {
-                      $showgroup = "<h6>FR PDF</h6>";
-                    }
-        
-                  
-                  ?>
+          // getting the categories groupe = 'white oils price structure'
+          $get_catsen_query = "SELECT * FROM category WHERE groupe = 'white oils price structure' ORDER BY year DESC ";
+          $get_catsen = mysqli_query($conn, $get_catsen_query);
+          $i = 1;
+
+          while($row = mysqli_fetch_assoc($get_catsen)) {
+            // category table
+            $cat_id = $row['id'];
+            $cat_name = $row['name'];
+            $cat_group = $row['groupe'];
+            $cat_year = $row['year'];
+            $cat_createdby = $row['createdby'];
+            $cat_createdon = $row['created_on'];
+            $cat_updatedon = $row['updated_on'];
+
+            // if($cat_group == "white oils price structure") {
+            //   $showgroup = "<h6>EN PDF</h6>";
+            // } elseif($cat_group == "structure des prix produits blanc") {
+            //   $showgroup = "<h6>FR PDF</h6>";
+            // }
+
           
-        
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="?cat_id=<?= $cat_id; ?>"><?= $cat_name; ?></a>
-          </li>
+          ?>
+          
+          <?php 
+
+          if($cat_group == "white oils price structure") {
+            
+            echo '<li class="nav-item">
+                    <a class="nav-link " style="color:black;" aria-current="page" href="?cat_id='. $cat_id.'">'.$cat_name.'</a>
+                  </li>';
+          }
+
+           ?>
+           <?php } ?>
+          
           <!-- <li class="nav-item">
             <a class="nav-link" href="#">Link</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Link</a>
           </li> -->
-          <?php } ?>
+          <li class="nav-item">
+            <a class="nav-link" href="#" style="font-size:larger;">structure des prix produits blanc</a>
+          </li>
+          <?php
+        
+          // getting the categories groupe = 'structure des prix produits blanc'
+          $get_catsfr_query = "SELECT * FROM category WHERE groupe = 'structure des prix produits blanc' ORDER BY year DESC ";
+          $get_catsfr = mysqli_query($conn, $get_catsfr_query);
+          $i = 1;
+
+          while($row = mysqli_fetch_assoc($get_catsfr)) {
+            // category table
+            $cat_id = $row['id'];
+            $cat_name = $row['name'];
+            $cat_group = $row['groupe'];
+            $cat_year = $row['year'];
+            $cat_createdby = $row['createdby'];
+            $cat_createdon = $row['created_on'];
+            $cat_updatedon = $row['updated_on'];
+
+            // if($cat_group == "white oils price structure") {
+            //   $showgroup = "<h6>EN PDF</h6>";
+            // } elseif($cat_group == "structure des prix produits blanc") {
+            //   $showgroup = "<h6>FR PDF</h6>";
+            // }
+
+          
+          ?>
+          
+          <?php 
+
+         
+            
+            echo '<li class="nav-item">
+                    <a class="nav-link " style="color:black;" aria-current="page" href="?cat_id='. $cat_id.'">'.$cat_name.'</a>
+                  </li>';
+   
+
+           ?>
+           <?php } ?>
+          <?php ?>
         </ul>
      </div>
      <div class="griditem">
        <!-- pdfs -->
        <div class="row">
-
          <?php
             //loop thro different months
             $months = [
@@ -329,16 +383,22 @@ if(isset($_POST['addcat'])) {
   
             
          ?>
+
+       <div class="col-md-3">
+
          <div class="wrapper">
             <form action="#">
               <input class="file-input" type="file" name="file" hidden>
               <i class="fas fa-cloud-upload-alt"></i>
               
-              <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
+              <button type="button" class="btn monthmodal" data-id="<?=  $month; ?>" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
               <?php echo $month; ?>
               </button>
             </form>
           </div>
+
+       </div>
+
           <?php } ?>
 
        </div>
@@ -373,6 +433,14 @@ if(isset($_POST['addcat'])) {
 
     // Get the element with id="defaultOpen" and click on it
     document.getElementById("defaultOpen").click();
+
+    // on clik trash icon    
+    $('.monthmodal').click(function(){
+        //get cover id
+        var id=$(this).data('id');
+        //set href for cancel button
+        $('#addpdfmodal').attr('href','add_pdf.php?id='+id);
+    });
 
   </script>
    

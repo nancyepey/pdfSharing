@@ -38,6 +38,7 @@
 		"csph investments and partners" => "investissements de la csph",
 		"hpsf" => "csph",
 		"HPSF" => "CSPH",
+		"Dashboard" => "Tableau de bord",
 		"online tax filing" => "online tax filing",
 		"distribution chain" => "distribution chain",
 		"hpsf investment map" => "hpsf investment map",

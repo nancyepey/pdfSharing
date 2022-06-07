@@ -391,14 +391,15 @@ if(!isset($user_id)){
                   
                   <img src="../uploads/images/<?= $user_image; ?>" class="rounded-circle" alt="Profile Image" width="25" height="25">
                 </td>
-              <td><?= $user_uname; ?></td>
-              <td><?= $user_name; ?></td>
-              <td><?= $user_email; ?></td>
-              <td><?= $user_role; ?></td>
+              <td><span id="euname<?= $user_id; ?>"><?= $user_uname; ?></td>
+              <td><span id="ename<?= $user_id; ?>"><?= $user_name; ?></td>
+              <td><span id="eemail<?= $user_id; ?>"><?= $user_email; ?></td>
+              <td><span id="erole<?= $user_id; ?>"><?= $user_role; ?></td>
               <td><?= $user_date; ?></td>
               <td>
               
                 
+                <span id="estatus<?php echo $user_id; ?>">
                 <?php
 
                   if ($user_status) {
@@ -417,7 +418,7 @@ if(!isset($user_id)){
                 </button>
               </td>
               <td>
-                  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteusermodal">
+                  <button type="button" class="btn btn-danger editmodal" value="<?php echo $user_id; ?>" data-bs-toggle="modal" data-bs-target="#deleteusermodal">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
               </td>
@@ -447,22 +448,26 @@ if(!isset($user_id)){
               
                 <div class="mb-3">
                   <label for="uname" class="form-label">Username</label>
-                  <input type="text" class="form-control" id="uname" placeholder="" value="<?= $user_uname; ?>" required>
+                  <input type="text" class="form-control" id="vuname" name="uname" placeholder="" required>
                 </div>
                 <div class="mb-3">
                   <label for="name" class="form-label">Name</label>
-                  <input type="text" class="form-control" id="name" placeholder="" value="<?= $user_name; ?>" required>
+                  <input type="text" class="form-control" id="vname" name="name" placeholder=""required>
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="vemail" name="email" required>
                 </div>
                 <div class="form-group">
                   <label for="image">Old Profile Pic</label>
                   <div class="custom-file">
-                    <input type="hidden" name="old_image" value="<?= $user_image; ?>">
+                    <input type="hidden" name="old_image">
                     <input type="file" name="upload_image" class="custom-file-input" accept="image/jpg, image/jpeg, image/png">
                   </div>
 	              </div>
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
-                    <select class="form-select" aria-label="Default select example" id="role" disabled>
+                    <select class="form-select" aria-label="Default select example" id="vrole" name="role" disabled>
                         <option selected><?= $user_role; ?></option>
                         <option value="1">Administrator</option>
                         <option value="2">Manager</option>
@@ -472,7 +477,7 @@ if(!isset($user_id)){
                 </div>
                 <div class="mb-3 form-check">
                   <input type="hidden" name="status" value="0">
-                  <input type="checkbox" class="form-check-input" id="status" name="status"  value="1" >
+                  <input type="checkbox" class="form-check-input" id="vstatus" name="status"  value="1" >
                   
                   <label class="form-check-label" for="status">Active</label>
                 </div>
@@ -530,7 +535,28 @@ if(!isset($user_id)){
 
  
 
+<script>
+$(document).ready(function(){
+  console.log("gi");
+	$(document).on('click', '.editmodal', function(){
+		var id=$(this).val();
+		var uname=$('#euname'+id).text();
+		var name=$('#ename'+id).text();
+		var email=$('#eemail'+id).text();
+		var role=$('#erole'+id).text();
+		var status=$('#estatus'+id).text();
 
+    console.log(status);
+	
+		$('#editusermodal').modal('show');
+		$('#vuname').val(uname);
+		$('#vname').val(name);
+		$('#vemail').val(email);
+		$('#vrole').val(role);
+		$('#vstatus').val(status);
+	});
+});
+</script>
 
    
 
