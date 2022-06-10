@@ -8,7 +8,10 @@ include '../config.php';
 
 <?php
 
-$uname = $_POST["uname"];
+session_start();
+
+           
+$uname =  $_SESSION['name'] ;
 
 
 // adding pdf into database
@@ -26,13 +29,13 @@ if(isset($_POST["pdffile"]))
   $CurrentTime =time(); //current time in seconds
   $DateTime = strftime("%B-%d-%Y %H:%M:%S",$CurrentTime); 
   $updated_on = $DateTime;
-  header('location:./users.php');
+  echo "inside post pdffile ";
 
   // STORE PDF FILE IN FOLDER
-  if(isset($_FILES["upload_pdf"]['name']))
+  if(isset($_POST["pdffile"]['name']))
   {
       echo "inside file set"; 
-      header('location:./main.php');
+      
       //getting the image
       // File upload path
       // $cpath="../uploads/pdfs/";
@@ -52,7 +55,7 @@ if(isset($_POST["pdffile"]))
       // }
   } else {
     echo "no file set";
-    header('location:./articles.php');
+    
   }
 
 

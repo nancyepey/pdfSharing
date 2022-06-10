@@ -199,38 +199,38 @@ $( document ).ready(function() {
  //save pdf
  function savepdf() {
   
-  // console.log( "Add File click" );
+  console.log( "Add File click" );
 
-  // var pdffile = $("#uploadpdf").val();
-  // var catpdf  = $("#catpdf").val();
-  // var month   = $("#monthpdf").val();
+  var pdffile = $("#uploadpdf").val();
+  var catpdf  = $("#catpdf").val();
+  var month   = $("#monthpdf").val();
 
-  // if(pdffile == '' || catpdf == '' || month == '') {
-  //   alert("Please fill all fields." + pdffile +' '+ catpdf +' '+ month)
-  //   return false;
-  // }
+  if(pdffile == '' || catpdf == '' || month == '') {
+    alert("Please fill all fields." + pdffile +' '+ catpdf +' '+ month)
+    return false;
+  }
 
-  // $.ajax({
-  //   type: "POST",
-  //   url: "add_pdf.php",
-  //   data: {
-  //     pdffile  : pdffile,
-  //     catpdf   : catpdf,
-  //     month    : month
-  //   },
-  //   cache: false,
-  //   success: function(data) {
-  //     alert("fields: " + pdffile +' '+ catpdf +' '+ month)
-  //     console.log("send pdf details");
-  //     // console.log(data);
-  //     // $(".seeresultstest").html(data);
-  //     $('#addpdfmodal').modal('hide');
-  //   },
-  //   error: function(xhr, status, error) {
-  //       console.error(xhr);
-  //       $('#addpdfmodal').modal('hide');
-  //   }
-  // });
+  $.ajax({
+    type: "POST",
+    url: "add_pdf.php",
+    data: {
+      pdffile  : pdffile,
+      catpdf   : catpdf,
+      month    : month
+    },
+    cache: false,
+    success: function(data) {
+      alert("fields: " + pdffile +' '+ catpdf +' '+ month)
+      console.log("send pdf details");
+      // console.log(data);
+      $(".seeresultstest").html(data);
+      $('#addpdfmodal').modal('hide');
+    },
+    error: function(xhr, status, error) {
+        console.error(xhr);
+        $('#addpdfmodal').modal('hide');
+    }
+  });
 
 
   // console.log(document.getElementById('addpdfform'));
@@ -380,8 +380,8 @@ $( document ).ready(function() {
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <!-- <button type="button" class="btn btn-primary" >Add File</button> -->
-              <!-- <input type="submit" onclick="savepdf()" value="Add File" class="btn btn-primary" name="savepdf"> -->
-              <input type="submit" id="addpdfform" value="Add File" class="btn btn-primary" name="savepdf">
+              <input type="submit" onclick="savepdf()" value="Add File" class="btn btn-primary" name="savepdf">
+              <!-- <input type="submit" id="addpdfform" value="Add File" class="btn btn-primary" name="savepdf"> -->
             </div>
           </div>
         </div>
