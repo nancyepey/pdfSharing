@@ -6,10 +6,17 @@ session_start();
 
 // $admin_id = $_SESSION['admin_id'];
 $user_id = $_SESSION['id'];
+$username = $_SESSION['username'];
+           
+$name =  $_SESSION['name'] ;
+$email =  $_SESSION['email'];
+$role =  $_SESSION['role'];
+$pic =  $_SESSION['pic'] ;
+$date =  $_SESSION['date'] ;
 
 if(!isset($user_id)){
    header('location:../login.php');
-}
+} 
 
 ?>
 
@@ -67,10 +74,26 @@ if(!isset($user_id)){
     <?php include '../includes/hnav.php'; ?>
 
     <!-- main content -->
-
+<br>
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       
-      
+    <?php 
+        echo "<br>";
+        echo $user_id;
+        echo "<br>";
+        echo $username ;
+        echo "<br>";
+                  
+        echo $name  ;
+        echo "<br>";
+        echo $email  ;
+        echo "<br>";
+        echo $role  ;
+        echo "<br>";
+        echo $pic  ;
+        echo "<br>";
+        echo $date  ;
+    ?>
 
       
     </main>

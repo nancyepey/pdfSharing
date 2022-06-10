@@ -7,6 +7,7 @@ session_start();
 
 // $admin_id = $_SESSION['admin_id'];
 $user_id = $_SESSION['id'];
+$username = $_SESSION['name'];
 
 if(!isset($user_id)){
    header('location:../login.php');
@@ -271,6 +272,7 @@ if(isset($_POST['edituserSubmit'])) {
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
         +
       </button>
+      <?php echo $username; ?>
 
       <?php
 

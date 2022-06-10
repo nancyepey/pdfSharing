@@ -1,13 +1,14 @@
 <?php
 
-include '../config.php';
 
+include '../config.php';
 
 
 ?>
 
 <?php
 
+$uname = $_POST["uname"];
 
 
 // adding pdf into database
@@ -18,51 +19,46 @@ if(isset($_POST["pdffile"]))
   $pdffile = mysqli_real_escape_string($conn, $_POST['pdffile']);
   $catpdf = mysqli_real_escape_string($conn, $_POST['catpdf']);
   $monthpdf = mysqli_real_escape_string($conn, $_POST['month']);
-  $username = mysqli_real_escape_string($conn, $_POST['username']);
+  $username = $uname;
 
   //for datetime
   date_default_timezone_set("Africa/Douala"); //to specify time with respect to my zone
   $CurrentTime =time(); //current time in seconds
-  //strftime is string format time
-  //$DateTime = strftime("%Y-%m-%d %H:%M:%S",$CurrentTime); //mostly use when we have to apply sql format
   $DateTime = strftime("%B-%d-%Y %H:%M:%S",$CurrentTime); 
   $updated_on = $DateTime;
+  header('location:./users.php');
 
-  //getting the image
-  // File upload path
-  $targetDir_img = "../uploads/pdfs/";
-  $file_pdf = basename(escape($_FILES['upload_pdf']['name']));
-  $targetFilePath_img = $targetDir_img . $file_pdf;
-  $fileType_img = pathinfo($targetFilePath_img,PATHINFO_EXTENSION);
+  // STORE PDF FILE IN FOLDER
+  if(isset($_FILES["upload_pdf"]['name']))
+  {
+      echo "inside file set"; 
+      header('location:./main.php');
+      //getting the image
+      // File upload path
+      // $cpath="../uploads/pdfs/";
+      // $file_parts = pathinfo($_FILES["upload_pdf"]["name"]);
+      // $file_name = basename(escape($_FILES['upload_pdf']['name']));
+      // $file_path = $file_name.time().'.'.$file_parts['extension'];
+      // move_uploaded_file($_FILES["upload_pdf"]["tmp_name"], $cpath.$file_path);
+      // $file_pdf = $file_path;
 
-  if(!empty($_FILES["upload_file"]["name"])) {
-      // Allow certain file formats IMAGES
-      $allowTypes_img = array('pdf',);
-        //
-      if(in_array($fileType_img, $allowTypes_img)){
-          // Upload file to server
-          if(move_uploaded_file($_FILES["upload_pdf"]["tmp_name"], $targetFilePath_img)){
-
-            // save pdf in db
-            $query = "INSERT INTO document(pdf, month, category_id, added_by, updated_on) VALUES('$file_pdf' ,'$monthpdf', '$catpdf', '$username', '$updated_on')";
-            $savepdf_query = mysqli_query($conn, $query);
-            if($savepdf_query) {
-              $message[] = "PDF File added successfully";
-            } else {
-              $message[] = "Please try again an error occured!";
-            }
-            
-          }
-      }
+      // save pdf in db
+      // $query = "INSERT INTO document(pdf, month, category_id, added_by, updated_on) VALUES('$file_pdf' ,'$monthpdf', '$catpdf', '$username', '$updated_on')";
+      // $savepdf_query = mysqli_query($conn, $query);
+      // if($savepdf_query) {
+      //   $message[] = "PDF File added successfully";
+      // } else {
+      //   $message[] = "Please try again an error occured!";
+      // }
+  } else {
+    echo "no file set";
+    header('location:./articles.php');
   }
 
 
+
+
 }
-
-
-
-
-
 
 
 
@@ -101,9 +97,9 @@ if(isset($_POST["month_id"]))
                     <label for="inputcategory" class="col-form-label">Category</label>
                   </div>
                   <div class="col-auto">
-                    <select class="form-select form-control" value="'.$ct_id .'" name="category" aria-label="Disabled category select" disabled>
-                      <option >'.$ct_name.'</option>
-                      <option value="'.$ct_id .'" selected>'. $ct_name. '</option>
+                    <select class="form-select form-control" id="catpdf" name="category" aria-label="Disabled category select" disabled>
+                      <option value="'.$ct_id .'" selected>'.$ct_name.'</option>
+                      <option value="'.$ct_id .'">'. $ct_name. '</option>
                       </select>
                     </div>
                 </div>
