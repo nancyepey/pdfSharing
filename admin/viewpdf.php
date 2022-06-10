@@ -9,9 +9,23 @@ session_start();
 $user_id = $_SESSION['id'];
 $username = $_SESSION['username'];
 
+// getting cat id to add pdf
+$get_cat = 0;
+
+if (isset($_GET['cat_id'])) {
+  $get_cat = $_GET['cat_id'];
+} else {
+
+  $get_cat = 9;
+}
+
+
 if(!isset($user_id)){
    header('location:../login.php');
 }
+
+
+
 
 $showgroup = "";
 
@@ -60,6 +74,14 @@ if(isset($_POST['addcat'])) {
   }
 
 }
+
+
+
+
+// test
+// getting the last id 
+// echo wopslatestyearid();
+ 
 
 ?>
 
@@ -120,6 +142,87 @@ if(isset($_POST['addcat'])) {
       }
 
     </style>
+
+<!-- ✅ load jQuery ✅ -->
+<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+<script>
+$( document ).ready(function() {
+   console.log( "document loaded" );
+   
+ });
+
+ // get data from pdf modal
+ $("#savepdf").click(function() {
+  console.log( "savepdf modal clicked" );
+ });
+
+ //save pdf
+ function savepdf() {
+
+  console.log( "Save pdf click" );
+
+  var pdffile = $("#uploadpdf").val();
+  var catpdf  = $("#catpdf").val();
+  var month   = $("#monthpdf").val();
+
+  if(pdffile == '' || catpdf == '' || month == '') {
+    alert("Please fill all fields." + pdffile +' '+ catpdf +' '+ month)
+    return false;
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "viewpdf.php",
+    data: {
+      pdffile  : pdffile,
+      catpdf   : catpdf,
+      month    : month
+    },
+    cache: false,
+    success: function(data) {
+      alert("fields: " + pdffile +' '+ catpdf +' '+ month)
+      console.log("send pdf details");
+      console.log(data);
+      $('#addpdfmodal').modal('hide');
+    },
+    error: function(xhr, status, error) {
+        console.error(xhr);
+        $('#addpdfmodal').modal('hide');
+    }
+  });
+
+ }
+
+
+ //populate add pdf modal  
+ function addpdf(id_month, id_cat) {
+  //  
+  console.log( "Add PDF modal clicked" );
+   
+ 
+ console.log(id_month, id_cat);
+ $.ajax({url: "add_pdf.php",
+   method:'post',
+   data:{month_id:id_month, cat_id:id_cat},
+     success: function(result){
+      //  console.log(result);
+      console.log("SUCCESS");
+     $(".addpdfbody").html(result);
+   }})
+   .done(function(data) {  
+      // console.log("test: ", data);
+      console.log("DONE");
+    })
+    .fail(function(data) {
+      // console.log("error: ", data);
+      console.log("ERROR");
+    });
+
+ }
+
+
+</script>
    
 
   </head>
@@ -157,6 +260,11 @@ if(isset($_POST['addcat'])) {
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addcatmodal">
         + Category
       </button>
+      <p>
+        
+        
+        <?php  ?>
+      </p>
 
       <!-- Add PDF Modal -->
       <div class="modal fade" id="addpdfmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addpdfmodalLabel" aria-hidden="true">
@@ -166,14 +274,14 @@ if(isset($_POST['addcat'])) {
               <h5 class="modal-title" id="addpdfmodalLabel">Add File</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body addpdfbody">
               <!-- form -->
-              <form method="post">
+              <form action="" method="post"  enctype="multipart/form-data">
                 <!-- <div class="mb-3">
                   <label for="name" class="form-label">Title</label>
                   <input type="text" class="form-control" id="name" placeholder="">
                 </div> -->
-                <div class="form-group mb-2">
+                <!-- <div class="form-group mb-2">
                   <label for="file">Upload PDF</label>
                   <div class="custom-file">
                     <input type="file" name="upload_file" class="custom-file-input" id="file">
@@ -187,32 +295,20 @@ if(isset($_POST['addcat'])) {
                   <div class="col-auto">
                     <select class="form-select form-control" name="category" aria-label="category select">
                       <option selected>Select Category</option>
-                      <?php
-                      // getting the categories
-                      $get_catss_query = "SELECT * FROM category ";
-                      $get_catss = mysqli_query($conn, $get_catss_query);
-                      while($row = mysqli_fetch_assoc($get_catss)) {
-                        // getting row values
-                        $ct_id = $row['id'];
-                        $ct_name = $row['name'];
-                      // }
-
-                      ?>
-                      <option value="<?= $ct_id; ?>"><?= $ct_name; ?></option>
-                      <!-- <option value="structure des prix produits blanc">Structure des prix produits blanc</option> -->
-                      <?php } ?>
+                     
                     </select>
                   </div>
                 </div>
                 <div class="mb-3">
                   <label for="description" class="form-label">Description</label>
                   <textarea class="form-control" id="description" rows="2"></textarea>
-                </div>
+                </div> -->
               </form>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Add File</button>
+              <!-- <button type="button" class="btn btn-primary" >Add File</button> -->
+              <input type="submit" onclick="savepdf()" value="Add File" class="btn btn-primary" name="savepdf">
             </div>
           </div>
         </div>
@@ -380,6 +476,8 @@ if(isset($_POST['addcat'])) {
               "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
             ];
             foreach ($months as $month) {
+
+              $month_index = array_search($month, $months);
   
             
          ?>
@@ -391,7 +489,7 @@ if(isset($_POST['addcat'])) {
               <input class="file-input" type="file" name="file" hidden>
               <i class="fas fa-cloud-upload-alt"></i>
               
-              <button type="button" class="btn monthmodal" data-id="<?=  $month; ?>" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
+              <button type="button" onclick="addpdf('<?php echo $month_index; ?>', '<?php echo $get_cat; ?>')" class="btn monthmodal" data-id="<?=  $month; ?>" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
               <?php echo $month; ?>
               </button>
             </form>

@@ -2,7 +2,7 @@
 
 include '../config.php';
 
-
+include '../admin/langfig.php';
 
 
 $user_id = $_SESSION['name'];
@@ -19,7 +19,10 @@ $user_id = $_SESSION['name'];
     <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
     <div class="navbar-nav">
       <div class="nav-item text-nowrap">
-        <a class="nav-link px-3" href="../logout.php">Sign out</a>
+        <a class="nav-link px-3" href="?lang=<?= $lg_c; ?>"><?= $lg_c; ?></a>
+      </div>
+      <div class="nav-item text-nowrap">
+        <a class="nav-link px-3" href="../logout.php"><?php echo $lang['signout'] ?></a>
       </div>
     </div>
 </header>

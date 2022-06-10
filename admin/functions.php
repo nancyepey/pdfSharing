@@ -2,6 +2,27 @@
 
 <?php
 
+
+// function to get the last white oil price structure year id
+function wopslatestyearid() {
+
+    //getting our connection to get access to db
+    global $conn;
+
+    // getting the categories groupe = 'white oils price structure'
+    $catsen_query = "SELECT * FROM category WHERE groupe = 'white oils price structure' ";
+   
+    $conn->query($catsen_query);
+    $last_inserted_id=$conn->insert_id; // returns last ID
+    
+    return $last_inserted_id;
+    
+    // return "not found";
+
+}
+
+
+
 // protect ourself from sql injection
 function escape($string) {
 

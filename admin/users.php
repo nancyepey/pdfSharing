@@ -160,6 +160,10 @@ if(!isset($user_id)){
 
 }
 
+if(isset($_POST['edituserSubmit'])) {
+  
+}
+
 
 ?>
 
@@ -173,11 +177,35 @@ if(!isset($user_id)){
     <meta name="generator" content="Hugo 0.84.0">
     <title>Dashboard </title>
 
-    
-    
 
     <!-- Bootstrap core CSS -->
     <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+     <!-- ✅ load jQuery ✅ -->
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    
+    <script>
+    $( document ).ready(function() {
+        console.log( "document loaded" );
+        
+      });
+      function edituser(id_user) {
+       //  
+       console.log( "edit modal clicked" );
+        
+      
+      console.log(id_user);
+      $.ajax({url: "edituser.php",
+        method:'post',
+        data:{user_id:id_user},
+          success: function(result){
+          $(".editbody").html(result);
+        }});
+
+      }
+
+
+    </script>
     
 
     <!-- <style>
@@ -234,7 +262,7 @@ if(!isset($user_id)){
     ?>
       
   <div class="container" style="margin-right: 40px;">
-    <h2>USERS</h2>
+    <h2><?php echo strtoupper($lang['users']); ?></h2>
     <!-- <div class="buttons">
     <a class='btn btn-primary' href='#' target='_blank'>+</a>
     </div> -->
@@ -349,14 +377,14 @@ if(!isset($user_id)){
             <tr>
               <th scope="col">#</th>
               <th scope="col">Image</th>
-              <th scope="col">User</th>
-              <th scope="col">Name</th>
-              <th scope="col">Email</th>
-              <th scope="col">Role</th>
+              <th scope="col"><?php echo $lang['user'] ?></th>
+              <th scope="col"><?php echo $lang['name'] ?></th>
+              <th scope="col"><?php echo $lang['email'] ?></th>
+              <th scope="col"><?php echo $lang['role'] ?></th>
               <th scope="col">Date</th>
               <th scope="col">Status</th>
-              <th scope="col">Edit</th>
-              <th scope="col">Delete</th>
+              <th scope="col"><?php echo $lang['edit'] ?></th>
+              <th scope="col"><?php echo $lang['delete'] ?></th>
             </tr>
           </thead>
           <tbody>
@@ -413,12 +441,12 @@ if(!isset($user_id)){
                 
               </td>
               <td>
-                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#editusermodal">
+                <button type="button" onclick="edituser('<?php echo $user_id; ?>')" class="btn btn-info edtmodal" id="<?php echo $user_id; ?>" data-bs-toggle="modal" data-bs-target="#editusermodal">
                     <i class="fas fa-edit"></i>
                 </button>
               </td>
               <td>
-                  <button type="button" class="btn btn-danger editmodal" value="<?php echo $user_id; ?>" data-bs-toggle="modal" data-bs-target="#deleteusermodal">
+                  <button type="button"  class="btn btn-danger " value="<?php echo $user_id; ?>" data-bs-toggle="modal" data-bs-target="#deleteusermodal">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
               </td>
@@ -444,9 +472,9 @@ if(!isset($user_id)){
               <h5 class="modal-title" id="editusermodalLabel">Edit User</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body editbody">
               
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                   <label for="uname" class="form-label">Username</label>
                   <input type="text" class="form-control" id="vuname" name="uname" placeholder="" required>
                 </div>
@@ -468,7 +496,7 @@ if(!isset($user_id)){
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select" aria-label="Default select example" id="vrole" name="role" disabled>
-                        <option selected><?= $user_role; ?></option>
+                        <option selected>Select Option</option>
                         <option value="1">Administrator</option>
                         <option value="2">Manager</option>
                         <option value="3">Writer</option>
@@ -480,7 +508,7 @@ if(!isset($user_id)){
                   <input type="checkbox" class="form-check-input" id="vstatus" name="status"  value="1" >
                   
                   <label class="form-check-label" for="status">Active</label>
-                </div>
+                </div> -->
                 <!-- <div class="form-check form-switch">
                   <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
                   <label class="form-check-label" for="flexSwitchCheckDefault">Active</label>
@@ -490,7 +518,7 @@ if(!isset($user_id)){
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               
-              <input type="submit" value="Edit User" class="btn btn-primary" name="submit">
+              <input type="submit" value="Edit User" class="btn btn-primary" name="edituserSubmit">
             </div>
 
             </form>
@@ -533,29 +561,48 @@ if(!isset($user_id)){
       
   </main>
 
- 
+
+
 
 <script>
-$(document).ready(function(){
-  console.log("gi");
-	$(document).on('click', '.editmodal', function(){
-		var id=$(this).val();
-		var uname=$('#euname'+id).text();
-		var name=$('#ename'+id).text();
-		var email=$('#eemail'+id).text();
-		var role=$('#erole'+id).text();
-		var status=$('#estatus'+id).text();
 
-    console.log(status);
+// $(document).ready(function(){
+//   console.log(status);
+  //   $('editmodal').click(function(){
+  // id_emp = $(this).attr('id')
+  //       $.ajax({url: "select.php",
+  //       method:'post',
+  //       data:{emp_id:id_emp},
+  //        success: function(result){
+  //   $(".modal-body").html(result);
+  // }});
+
+
+  //       $('#myModal').modal("show");
+  //   })
+// })
+
+
+// $(document).ready(function(){
+//   console.log("gi");
+// 	$(document).on('click', '.editmodal', function(){
+// 		var id=$(this).val();
+// 		var uname=$('#euname'+id).text();
+// 		var name=$('#ename'+id).text();
+// 		var email=$('#eemail'+id).text();
+// 		var role=$('#erole'+id).text();
+// 		var status=$('#estatus'+id).text();
+
+//     console.log(status);
 	
-		$('#editusermodal').modal('show');
-		$('#vuname').val(uname);
-		$('#vname').val(name);
-		$('#vemail').val(email);
-		$('#vrole').val(role);
-		$('#vstatus').val(status);
-	});
-});
+// 		$('#editusermodal').modal('show');
+// 		$('#vuname').val(uname);
+// 		$('#vname').val(name);
+// 		$('#vemail').val(email);
+// 		$('#vrole').val(role);
+// 		$('#vstatus').val(status);
+// 	});
+// });
 </script>
 
    
