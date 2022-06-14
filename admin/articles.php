@@ -22,8 +22,6 @@ if(!isset($user_id)){
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
     <title>Articles</title>
-
-    
     
 
     <!-- Bootstrap core CSS -->
@@ -65,7 +63,7 @@ if(!isset($user_id)){
 
   <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       
-  <div class="container" style="margin-right: 40px;">
+  <div class="container">
     <h3>News</h3>
     <!-- <div class="buttons">
     <a class='btn btn-primary' href='#' target='_blank'>+</a>
@@ -75,6 +73,13 @@ if(!isset($user_id)){
       <a class="btn btn-primary" style="text-decoration:none;" href="./add_article.php">
         +
       </a>
+
+      <?php
+
+        $get_news_query = "SELECT * FROM news ";
+        $get_news = mysqli_query($conn, $get_news_query);
+
+        ?>
 
 
       <div class="table-responsive">
@@ -86,7 +91,7 @@ if(!isset($user_id)){
               <th scope="col">Title</th>
               <th scope="col">Content</th>
               <th scope="col">Author</th>
-              <th scope="col">Category</th>
+              <!-- <th scope="col">Category</th> -->
               <th scope="col">Date</th>
               <th scope="col">View</th>
               <th scope="col">Edit</th>
@@ -94,18 +99,68 @@ if(!isset($user_id)){
             </tr>
           </thead>
           <tbody>
+          <?php
+
+            
+
+            //get size of the fetch result
+            //$count = $get_users->rowCount();
+            // echo $get_users->rowCount();
+            $i = 1;
+            //we need to values using a while loop
+            while($row = mysqli_fetch_assoc($get_news)) {
+
+              //news table
+              $new_id            = $row['id'];
+              $new_thumb         = $row['thumbnail'];
+              $new_tten          = $row['title_en'];
+              $new_ttfr         = $row['title_fr'];
+              $new_cnfr          = $row['content_fr'];
+              $new_cnen         = $row['content_en'];
+              $new_sdfr         = $row['short_desc_fr'];
+              $new_sden         = $row['short_desc_en'];
+              $new_start         = $row['state'];
+              $new_valid         = $row['validated'];
+              $new_author         = $row['author'];
+              $new_translator         = $row['translator'];
+              $new_date          = $row['created_on'];
+
+
+            ?>
             <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td><?php echo $i; ?></td>
+              <td>
+                <img src="../uploads/images/<?= $new_thumb; ?>" height="100" width="200" alt="">
+                
+              </td>
+              <td><?= $new_tten; ?></td>
+              <td>
+                <p>
+                <?php echo $new_sden; ?>
+                </p>
+              </td>
+              <td><?= $new_author; ?></td>
+              <td><?= $new_date; ?></td>
+              <td>
+                <a href='./viewnew.php?new_id=<?= $new_id; ?>'>Views</a>
+              </td>
+              <td>
+                <button type="button" class="btn btn-info " id="<?php echo $new_id; ?>">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+              </td>
+              <td>
+                <button type="button" class="btn btn-danger " id="<?php echo $new_id; ?>">
+                    <i class="fas fa-trash"></i>
+                </button>
+
+              </td>
             </tr>
+            <?php 
+                $i++;
+                } 
+              ?>
             
           </tbody>
         </table>
@@ -121,6 +176,7 @@ if(!isset($user_id)){
 
 
    
+  <script src="https://kit.fontawesome.com/fa0f4f5b37.js" crossorigin="anonymous"></script>
 
 
 <script src="../js/bootstrap.bundle.min.js"></script>

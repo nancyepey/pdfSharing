@@ -125,7 +125,7 @@ if(!isset($user_id)){
               // Upload file to server
               if(move_uploaded_file($_FILES["upload_image"]["tmp_name"], $targetFilePath_img)){
 
-                  //query to add post
+                  //query to add user
                   $query = "INSERT INTO users(username, name, email, password, role, image, active, updated_on)";
                   
                   //sending a value 

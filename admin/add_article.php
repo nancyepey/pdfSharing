@@ -111,7 +111,6 @@ if(!isset($user_id)){
 if(isset($_POST['add_article'])) {
     // 
     // defining variables
-    $thumbnailpic = escape($_POST['thumbnail']);
     $title_en = escape($_POST['title']);
     $title_fr = escape($_POST['titlefr']);
     $content_fr = escape($_POST['content']);
@@ -128,7 +127,7 @@ if(isset($_POST['add_article'])) {
     $CurrentTime =time(); //current time in seconds
     //strftime is string format time
     //$DateTime = strftime("%Y-%m-%d %H:%M:%S",$CurrentTime); //mostly use when we have to apply sql format
-    $DateTime = strftime("%B-%d-%Y %H:%M:%S",$CurrentTime); 
+    $DateTime = strftime("%m-%d-%Y %H:%M:%S",$CurrentTime); 
     $created_on = $DateTime;
     $updated_on = $DateTime;
 
@@ -167,23 +166,59 @@ if(isset($_POST['add_article'])) {
 
     } else {
         //
-        $file_image = '';
+        $file_thumbnail = '';
 
 
         //getting the image
         // File upload path
         $targetDir_img = "../uploads/images/";
-        // $file_image = basename($_FILES["file"]["name"]);
-        // $file_image = basename($_FILES["image"]["name"]);
-        $file_image = basename(escape($_FILES['upload_image']['name']));
-        $targetFilePath_img = $targetDir_img . $file_image;
+        $file_thumbnail = basename(escape($_FILES['thumbnail']['name']));
+        $targetFilePath_img = $targetDir_img . $file_thumbnail;
         $fileType_img = pathinfo($targetFilePath_img,PATHINFO_EXTENSION);
+
+        if(!empty($_FILES["thumbnail"]["name"])) {
+            //
+            $allowTypes_img = array('jpg','png','jpeg','gif');
+            if(in_array($fileType_img, $allowTypes_img)) {
+                //
+                if(move_uploaded_file($_FILES["thumbnail"]["tmp_name"], $targetFilePath_img)) {
+                    //
+                    //query to add article
+                    $query = "INSERT INTO news(thumbnail, title_en, title_fr, content_fr, content_en, short_desc_fr, short_desc_en, state, validated, author, translator, updated_on)";
+                    
+                    //sending a value
+                    $query .= "VALUES('{$file_thumbnail}' ,'{$title_en}', '{$title_fr}','{$content_fr}', '{$content_en}', '{$short_desc_fr}','{$short_desc_en}','{$state}','{$validated}','{$author}', '{$translator}', '{$updated_on}')";
+                    
+                    //sending the query to the database
+                    $create_file_query = mysqli_query($conn, $query);
+                    
+                    confirmQuery($create_file_query);
+                    
+                    $news_id = mysqli_insert_id($conn);
+
+                    if($create_file_query){
+                        // $message[] = "The file ".$file_image. " has been uploaded successfully.";
+                        $message[] = "<p class='bg-primary' style='text-align:center;'> <span style='text-transform:capitalize; color:orange;'>{$title_en}</span> New was Created Sucessfully.</p>";
+                        
+                    }else{
+                        $message[] = "New creation failed.";
+                    }
+
+                }else{
+                    $message[] = "Sorry, there was an error uploading your file.";
+                }
+            }else{
+                $message[] = 'Sorry, only JPG, JPEG, PNG, GIF, & PDF files are allowed to upload.';
+            }
+        }else{
+            $message[] = "File upload failed, please try again.";
+        }
         
     }
 
 }
 
-        $thumbnailpic = "<script>document.getElementByID('thmpic').value</script>";
+        
 
         if(isset($message)){
             foreach($message as $message){
@@ -206,9 +241,9 @@ if(isset($_POST['add_article'])) {
                 <div class="col-md-12">
                     <form action="" method="post" enctype="multipart/form-data">
 
-                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <!-- <ul class="nav nav-tabs" id="myTab" role="tablist"> -->
                         <!-- tabs head -->
-                        <li class="nav-item" role="presentation">
+                        <!-- <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="addN-tab" data-bs-toggle="tab" data-bs-target="#addN" type="button" role="tab" aria-controls="addN" aria-selected="true">Add</button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -220,7 +255,7 @@ if(isset($_POST['add_article'])) {
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="confN-tab" data-bs-toggle="tab" data-bs-target="#confN" type="button" role="tab" aria-controls="confN" aria-selected="false">Visibility</button>
                         </li>
-                    </ul>
+                    </ul> -->
 
                     <div class="row mt-3">
                         <div class="col-md-6">
@@ -231,29 +266,25 @@ if(isset($_POST['add_article'])) {
                                     
                                     <!-- <form action="" method="post" enctype="multipart/form-data"> -->
                                         <!-- add news config -->
-                                        <div class="mb-3">
+                                        <!-- <div class="mb-3">
                                             <label for="thumb" class="form-label">Thumbnail</label>
                                             <div class="drag-area">
                                                 <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
                                                 <header>Drag & Drop to Upload Image</header>
-                                                <!-- <span>OR</span> -->
+                                                
                                                 <button hidden>Browse File</button>
-                                                <input type="file" name="thumbnail" id="thmpic" hidden>
+                                                <input type="file" name="thumbnail" id="thmpic" >
                                             </div>
-                                        </div>
+                                        </div> -->
 
                                         <!-- save tab 1 btn -->
                                         <!-- <div class="mb-3">
                                             <input type="submit" name="saveThumb" onclick="savefile();" value="Save" id="saveThumb" class="btn btn-success">
                                         </div> -->
                                     <!-- </form> -->
-                                </div>
-                                <!-- tab 2 -->
-                                <div class="tab-pane fade" id="enN" role="tabpanel" aria-labelledby="enN-tab">
-                                    <!-- En -->
-                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
-
-                                        <div class="mb-3">
+                                    <input type="file" name="thumbnail" id="thmpic" >
+                                    
+                                    <div class="mb-3">
                                             <label for="title" class="form-label">Title</label>
                                             <input type="text" class="form-control" id="title" name="title" aria-describedby="titleHelp">
                                             <div id="titleHelp" class="form-text">Write a captivating title.</div>
@@ -270,21 +301,9 @@ if(isset($_POST['add_article'])) {
                                             
                                             
                                         </div>
-                                        <!-- save tab 2 btn -->
-                                        <!-- <div class="mb-3">
-                                            <input type="submit" name="saveEn" value="Save(EN)" id="saveEn" class="btn btn-success">
-                                        </div> -->
-                                        <!-- end en form -->
-                                    <!-- </form> -->
-                                </div>
-                                <!-- tab 3 -->
-                                <div class="tab-pane fade" id="frN" role="tabpanel" aria-labelledby="frN-tab">
-                                    <!-- Fr -->
-                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
-
                                         <div class="mb-3">
                                             <label for="titlefr" class="form-label">Titre</label>
-                                            <input type="text" class="form-control" id="titlefr" aria-describedby="titlefrHelp">
+                                            <input type="text" class="form-control" id="titlefr" name="titlefr" aria-describedby="titlefrHelp">
                                             <div id="titlefrHelp" class="form-text">Rédiger un titre captivant.</div>
                                         </div>                        
                                         <div class="mb-3">
@@ -297,21 +316,7 @@ if(isset($_POST['add_article'])) {
                                             <label for="contentFR" class="form-label">Contenu</label>
                                             <textarea class="form-control" name="contentFR" id="contentFR" aria-describedby="contentFRHelp"></textarea>
                                             
-                                            <!-- <div id="contentFRHelp" class="form-text">.</div> -->
                                         </div>
-                                        <!-- save tab 2 btn -->
-                                        <!-- <div class="mb-3">
-                                            <input type="submit" name="saveEn" value="Save(FR)" id="saveEn" class="btn btn-success">
-                                        </div> -->
-                                        <!-- end en form -->
-                                    <!-- </form> -->
-                                </div>
-                                <!-- tab 4 -->
-                                <div class="tab-pane fade" id="confN" role="tabpanel" aria-labelledby="confN-tab">
-                                    
-                                    <!-- config -->
-                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
-
                                         <div class="mb-3">
                                             <div class="col-auto">
                                                 <label for="status" class="col-form-label">Status</label>
@@ -351,6 +356,98 @@ if(isset($_POST['add_article'])) {
                                         <div class="mb-3">
                                             <input type="submit" name="add_article" value="Add Article" id="saveCfg" class="btn btn-success">
                                         </div>
+                                <!-- tab 2 -->
+                                <div class="tab-pane fade" id="enN" role="tabpanel" aria-labelledby="enN-tab">
+                                    <!-- En -->
+                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
+<!-- 
+                                        <div class="mb-3">
+                                            <label for="title" class="form-label">Title</label>
+                                            <input type="text" class="form-control" id="title" name="title" aria-describedby="titleHelp">
+                                            <div id="titleHelp" class="form-text">Write a captivating title.</div>
+                                        </div>                        
+                                        <div class="mb-3">
+                                            <label for="short_desc" class="form-label">Short Description</label>
+                                            <textarea class="form-control" name="short_desc" id="short_desc" cols="20" rows="4" aria-describedby="short_descHelp"></textarea>
+                                            
+                                            <div id="short_descHelp" class="form-text">Not more than 100 words.</div>
+                                        </div>                        
+                                        <div class="mb-3">
+                                            <label for="content" class="form-label">Content</label>
+                                            <textarea class="form-control" name="content" id="content" aria-describedby="contentHelp"></textarea>
+                                            
+                                            
+                                        </div> -->
+                                        <!-- save tab 2 btn -->
+                                        <!-- <div class="mb-3">
+                                            <input type="submit" name="saveEn" value="Save(EN)" id="saveEn" class="btn btn-success">
+                                        </div> -->
+                                        <!-- end en form -->
+                                    <!-- </form> -->
+                                </div>
+                                <!-- tab 3 -->
+                                <div class="tab-pane fade" id="frN" role="tabpanel" aria-labelledby="frN-tab">
+                                    <!-- Fr -->
+                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
+
+                                        <!-- <div class="mb-3">
+                                            <label for="titlefr" class="form-label">Titre</label>
+                                            <input type="text" class="form-control" id="titlefr" aria-describedby="titlefrHelp">
+                                            <div id="titlefrHelp" class="form-text">Rédiger un titre captivant.</div>
+                                        </div>                        
+                                        <div class="mb-3">
+                                            <label for="short_descfr" class="form-label">Description sommaire</label>
+                                            <textarea class="form-control" name="short_descfr" id="short_descfr" cols="20" rows="4" aria-describedby="short_descfrHelp"></textarea>
+                                            
+                                            <div id="short_descfrHelp" class="form-text">Pas plus de 100 mots.</div>
+                                        </div>                        
+                                        <div class="mb-3">
+                                            <label for="contentFR" class="form-label">Contenu</label>
+                                            <textarea class="form-control" name="contentFR" id="contentFR" aria-describedby="contentFRHelp"></textarea>
+                                             -->
+                                            <!-- <div id="contentFRHelp" class="form-text">.</div> -->
+                                        </div>
+                                        <!-- save tab 2 btn -->
+                                        <!-- <div class="mb-3">
+                                            <input type="submit" name="saveEn" value="Save(FR)" id="saveEn" class="btn btn-success">
+                                        </div> -->
+                                        <!-- end en form -->
+                                    <!-- </form> -->
+                                </div>
+                                <!-- tab 4 -->
+                                <div class="tab-pane fade" id="confN" role="tabpanel" aria-labelledby="confN-tab">
+                                    
+                                    <!-- config -->
+                                    <!-- <form action="" method="post" enctype="multipart/form-data"> -->
+
+                                        <!-- <div class="mb-3">
+                                            <div class="col-auto">
+                                                <label for="status" class="col-form-label">Status</label>
+                                            </div>
+                                            <div class="col-auto">
+                                                <select class="form-select form-select-sm " id="status" name="status" aria-label=".form-select-sm example">
+                                                    <option selected>Select Status</option>
+                                                    <option value="published">Published</option>
+                                                    <option value="unpublished">Unpublished</option>
+                                                    <option value="trash">Trash</option>
+                                                </select>
+                                            </div>
+                                        </div> -->
+                                        <!-- <div class="mb-3">
+                                            <div class="col-auto">
+                                                <label for="status" class="col-form-label">Access</label>
+                                            </div>
+                                            <div class="col-auto">
+                                                <select class="form-select form-select-sm " id="status" name="name" aria-label=".form-select-sm example">
+                                                    <option selected>Select Access</option>
+                                                    <option value="public">Public</option>
+                                                    <option value="internal">Internal</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <input type="submit" name="add_article" value="Add Article" id="saveCfg" class="btn btn-success">
+                                        </div> -->
                                         <!-- end en form -->
                                     </form>
                                 </div>

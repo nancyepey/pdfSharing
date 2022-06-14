@@ -51,7 +51,7 @@
           <a class="nav-link active" aria-current="page" href="admin/dashboard.php">Dashboard</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Notifications</a>
+          <a class="nav-link" href="news.php">News</a>
         </li>
         
         <li class="nav-item dropdown">

@@ -78,21 +78,21 @@ if(!isset($user_id)){
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       
     <?php 
-        echo "<br>";
-        echo $user_id;
-        echo "<br>";
-        echo $username ;
-        echo "<br>";
+        // echo "<br>";
+        // echo $user_id;
+        // echo "<br>";
+        // echo $username ;
+        // echo "<br>";
                   
-        echo $name  ;
-        echo "<br>";
-        echo $email  ;
-        echo "<br>";
-        echo $role  ;
-        echo "<br>";
-        echo $pic  ;
-        echo "<br>";
-        echo $date  ;
+        // echo $name  ;
+        // echo "<br>";
+        // echo $email  ;
+        // echo "<br>";
+        // echo $role  ;
+        // echo "<br>";
+        // echo $pic  ;
+        // echo "<br>";
+        // echo $date  ;
     ?>
 
       

@@ -196,12 +196,14 @@ $( document ).ready(function() {
   console.log( "savepdf modal clicked" );
  });
 
+
+
  //save pdf
  function savepdf() {
   
   console.log( "Add File click" );
 
-  var pdffile = $("#uploadpdf").val();
+  var pdffile = $("#upload_pdf").val();
   var catpdf  = $("#catpdf").val();
   var month   = $("#monthpdf").val();
 
@@ -209,6 +211,29 @@ $( document ).ready(function() {
     alert("Please fill all fields." + pdffile +' '+ catpdf +' '+ month)
     return false;
   }
+  // uploadFile();
+
+  const sample_image = document.getElementsByName('upload_pdf')[0];
+  console.log(sample_image);
+  console.log(sample_image.files[0]);
+  // upload_image(sample_image.files[0]);
+
+  const form_data = new FormData();
+  form_data.append('sample_image', sample_image.files[0]);
+
+  console.log(form_data);
+  // Display the key/value pairs
+  for (var pair of form_data.entries()) {
+      console.log(pair[0]+ ', ' + pair[1]); 
+  }
+
+  // await fetch('/uploadfile.php', {
+  //   method: "POST", 
+  //   body: form_data
+  // }); 
+  // alert('The file has been uploaded successfully.');
+  
+  
 
   $.ajax({
     type: "POST",
@@ -216,11 +241,16 @@ $( document ).ready(function() {
     data: {
       pdffile  : pdffile,
       catpdf   : catpdf,
-      month    : month
+      month    : month,
+      sample_image   : sample_image.files[0]
     },
     cache: false,
+    processData: false,
+    contentType: false,
     success: function(data) {
+      // console.log(data);
       alert("fields: " + pdffile +' '+ catpdf +' '+ month)
+      // alert(data)
       console.log("send pdf details");
       // console.log(data);
       $(".seeresultstest").html(data);
@@ -276,7 +306,8 @@ $( document ).ready(function() {
      success: function(result){
       //  console.log(result);
       console.log("SUCCESS");
-     $(".addpdfbody").html(result);
+    //  $(".addpdfbody").html(result);
+     $(".addpdfbody").append(result);
    }})
    .done(function(data) {  
       // console.log("test: ", data);
@@ -331,7 +362,7 @@ $( document ).ready(function() {
       <p class="seeresultstest">
         
         
-        <?php echo $username; echo $user_id; ?>
+        <?php //echo $username; echo $user_id; ?>
       </p>
 
       <!-- Add PDF Modal -->
@@ -345,6 +376,13 @@ $( document ).ready(function() {
             <div class="modal-body addpdfbody">
               <!-- form -->
               <form id="addpdfform" class="addpdfform" action="" method="post"  enctype="multipart/form-data" >
+                <div class="form-group mb-2">
+                    <label for="file">Upload PDF</label>
+                    <div class="custom-file">
+                      <input type="file" id="upload_pdf" name="upload_pdf">
+                      <label for="file" class="custom-file-label">Choose File</label>
+                    </div>
+                </div>
                 <!-- <div class="mb-3">
                   <label for="name" class="form-label">Title</label>
                   <input type="text" class="form-control" id="name" placeholder="">
@@ -371,10 +409,10 @@ $( document ).ready(function() {
                   <label for="description" class="form-label">Description</label>
                   <textarea class="form-control" id="description" rows="2"></textarea>
                 </div> -->
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                   <label for="description" class="form-label">Description</label>
                   <textarea class="form-control" id="description" rows="2"></textarea>
-                </div> 
+                </div>  -->
               </form>
             </div>
             <div class="modal-footer">
@@ -579,7 +617,26 @@ $( document ).ready(function() {
 
  </div>
 
-
+<!-- Modal -->
+<!-- <div class="modal fade" id="addpdfmodal" role="dialog">
+  <div class="modal-dialog">
+  
+    
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add File</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+    
+  </div>
+</div> -->
       
   </main>
 
