@@ -2,6 +2,7 @@
 
 
 include '../config.php';
+include_once 'functions.php';
 
 
 ?>
@@ -13,18 +14,18 @@ session_start();
            
 $uname =  $_SESSION['name'] ;
 
-echo "outside";
+
 // adding pdf into database
 // if(isset($_POST["pdffile"]))
 if(isset($_FILES['sample_image']['name']))
 {
-
+  // echo "inside";
   //get data
   $pdffile = mysqli_real_escape_string($conn, $_POST['pdffile']);
   $catpdf = mysqli_real_escape_string($conn, $_POST['catpdf']);
   $monthpdf = mysqli_real_escape_string($conn, $_POST['month']);
   $username = $uname;
-  echo $username;
+  // echo $username;
   
 
   // get pdf name
@@ -37,7 +38,7 @@ if(isset($_FILES['sample_image']['name']))
   //for datetime
   date_default_timezone_set("Africa/Douala"); //to specify time with respect to my zone
   $CurrentTime =time(); //current time in seconds
-  $DateTime = strftime("%B-%d-%Y %H:%M:%S",$CurrentTime); 
+  $DateTime = strftime("%m-%d-%Y %H:%M:%S",$CurrentTime); 
   $updated_on = $DateTime;
   // echo "inside post pdffile ";
   // echo $pdffile;
@@ -46,40 +47,42 @@ if(isset($_FILES['sample_image']['name']))
  
   // echo "inside file set";
   
-  $extension = pathinfo($_FILES['upload_pdf']['name'], PATHINFO_EXTENSION);
+  $extension = pathinfo($_FILES['sample_image']['name'], PATHINFO_EXTENSION);
 
-  $new_name = time() . '.' . $extension;
-  $filename = $_FILES['upload_pdf']['name'];
+  // $new_name = time() . '.' . $extension;
+  $filename = $_FILES['sample_image']['name'];
 
-  move_uploaded_file($_FILES['upload_pdf']['tmp_name'], '../uploads/pdfs/' . $filename);
+  move_uploaded_file($_FILES['sample_image']['tmp_name'], '../uploads/pdfs/' . $filename);
 
-  echo $file_name;
-  echo "inside files";
+  // echo $file_name;
+  // echo "inside files";
   $data = array(
     'image_source'		=>	'' . $username
   );
 
-  echo json_encode($data);
+  // echo json_encode($data);
 
 
   
   // getting the image
   // File upload path
-  $cpath="./uploads/";
-  $file_parts = pathinfo($_FILES["upload_pdf"]["name"]);
-  $file_name = basename(escape($_FILES['upload_pdf']['name']));
-  $file_path = $file_name.time().'.'.$file_parts['extension'];
-  move_uploaded_file($_FILES["upload_pdf"]["tmp_name"], $cpath.$file_path);
-  $file_pdf = $file_path;
+  // $cpath="./uploads/";
+  // $file_parts = pathinfo($_FILES["sample_image"]["name"]);
+  // $file_name = basename(escape($_FILES['sample_image']['name']));
+  // $file_path = $file_name.time().'.'.$file_parts['extension'];
+  // move_uploaded_file($_FILES["sample_image"]["tmp_name"], $cpath.$file_path);
+  // $file_pdf = $file_path;
 
   // save pdf in db
-  // $query = "INSERT INTO document(pdf, month, category_id, added_by, updated_on) VALUES('$file_pdf' ,'$monthpdf', '$catpdf', '$username', '$updated_on')";
-  // $savepdf_query = mysqli_query($conn, $query);
-  // if($savepdf_query) {
-  //   $message[] = "PDF File added successfully";
-  // } else {
-  //   $message[] = "Please try again an error occured!";
-  // }
+  $query = "INSERT INTO document(pdf, month, category_id, added_by, updated_on) VALUES('$filename' ,'$monthpdf', '$catpdf', '$username', '$updated_on')";
+  $savepdf_query = mysqli_query($conn, $query);
+  if($savepdf_query) {
+    $message[] = "PDF File added successfully";
+    echo "PDF File added successfully";
+  } else {
+    $message[] = "Please try again an error occured!";
+    echo "Please try again an error occured!";
+  }
  
 
 

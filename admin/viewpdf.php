@@ -220,6 +220,9 @@ $( document ).ready(function() {
 
   const form_data = new FormData();
   form_data.append('sample_image', sample_image.files[0]);
+  form_data.append('pdffile', pdffile);
+  form_data.append('catpdf', catpdf);
+  form_data.append('month', month);
 
   console.log(form_data);
   // Display the key/value pairs
@@ -238,12 +241,13 @@ $( document ).ready(function() {
   $.ajax({
     type: "POST",
     url: "add_pdf.php",
-    data: {
-      pdffile  : pdffile,
-      catpdf   : catpdf,
-      month    : month,
-      sample_image   : sample_image.files[0]
-    },
+    data: form_data,
+    // data: {
+    //   pdffile  : pdffile,
+    //   catpdf   : catpdf,
+    //   month    : month,
+    //   sample_image   : sample_image.files[0]
+    // },
     cache: false,
     processData: false,
     contentType: false,
@@ -595,6 +599,39 @@ $( document ).ready(function() {
 
        <div class="col-md-3">
 
+        <?php
+          $mons = [
+            "January", 
+            "February", 
+            "March", 
+            "April", 
+            "May", 
+            "June", 
+            "July", 
+            "August", 
+            "September", 
+            "October", 
+            "November", 
+            "December"
+          ];
+          echo $mons[$month_index];
+          //getting docs
+          
+          $doc_query = "SELECT * FROM document WHERE month = '{$mons[$month_index]}' AND category_ID = '{$get_cat}'";
+          $get_doc = mysqli_query($conn, $doc_query);
+          
+
+          if(mysql_num_rows($get_doc)) {
+
+          
+        ?>
+          <a href="#"><img src="../uploads/images/pdfimg.png" width="130px" alt="pdf image"></a>
+        <?php 
+          
+            
+          } else {
+        ?>
+
          <div class="wrapper">
             <form action="#">
               <input class="file-input" type="file" name="file" hidden>
@@ -605,6 +642,11 @@ $( document ).ready(function() {
               </button>
             </form>
           </div>
+          <?php 
+          
+            
+          }
+        ?>
 
        </div>
 
