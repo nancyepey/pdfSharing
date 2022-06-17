@@ -621,11 +621,11 @@ $( document ).ready(function() {
           $get_doc = mysqli_query($conn, $doc_query);
           
 
-          if(mysql_num_rows($get_doc)) {
+          if(mysqli_num_rows($get_doc)) {
 
           
         ?>
-          <a href="#"><img src="../uploads/images/pdfimg.png" width="130px" alt="pdf image"></a>
+          <a href="#"><img src="../uploads/images/pdfimg.png" width="90px"  alt="pdf image"></a>
         <?php 
           
             
