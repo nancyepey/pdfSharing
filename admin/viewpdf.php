@@ -614,7 +614,7 @@ $( document ).ready(function() {
             "November", 
             "December"
           ];
-          echo $mons[$month_index];
+          //echo $mons[$month_index];
           //getting docs
           
           $doc_query = "SELECT * FROM document WHERE month = '{$mons[$month_index]}' AND category_ID = '{$get_cat}'";
@@ -623,11 +623,14 @@ $( document ).ready(function() {
 
           if(mysqli_num_rows($get_doc)) {
 
+            while($row = mysqli_fetch_assoc($get_doc)) {
+              $file = $row['pdf']; 
           
         ?>
-          <a href="#"><img src="../uploads/images/pdfimg.png" width="90px"  alt="pdf image"></a>
+          <a href="./openpdf.php?file=<?php echo $file; ?>" target="_blank"><img src="../uploads/images/pdfimg.png" width="90px"  alt="pdf image"></a>
         <?php 
           
+          }
             
           } else {
         ?>
