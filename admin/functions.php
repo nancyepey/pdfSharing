@@ -21,6 +21,17 @@ function wopslatestyearid() {
 
 }
 
+//this function is to redirect user to any location set in
+function redirect($location) {
+
+    // return header("Location:" . $location);
+    //not using return
+    header("Location:" . $location);
+    //we will just exist this
+    exist;
+
+}
+
 
 
 // protect ourself from sql injection

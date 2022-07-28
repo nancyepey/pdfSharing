@@ -107,6 +107,7 @@
                 
               </div>
               <span class="d-block"> <?php echo $new_sdfr; ?></span>
+              <a href="validate.php?a_id=<?= $new_id; ?>" target="_blank">Validate</a>
             </div>
           </div>
           <?php } ?>
