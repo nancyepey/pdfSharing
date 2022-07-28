@@ -17,7 +17,7 @@ if (isset($_GET['cat_id'])) {
   $get_cat = $_GET['cat_id'];
 } else {
 
-  $get_cat = 9;
+  $get_cat = 14;
 }
 
 
@@ -31,6 +31,45 @@ if(isset($_POST['savepdf'])) {
   echo "inside save pdf";
   $message[] = "inside save pdf";
 }
+
+// months
+$months = [
+  "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+];
+    
+$monthsfr = [
+  "JAN", "FEV", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+];
+
+$mons = [
+  "January", 
+  "February", 
+  "March", 
+  "April", 
+  "May", 
+  "June", 
+  "July", 
+  "August", 
+  "September", 
+  "October", 
+  "November", 
+  "December"
+];
+
+$monsfr = [
+  "Janvier", 
+  "Fevrier", 
+  "Mars", 
+  "Avril", 
+  "Mai", 
+  "Juin", 
+  "Jullet", 
+  "Aout", 
+  "Septembre", 
+  "Octobre", 
+  "Novembre", 
+  "Decembre"
+];
 
 
 $showgroup = "";
@@ -487,7 +526,7 @@ $( document ).ready(function() {
   <div class="pdfsharegrid">
     <!--  -->
     <div class="griditem">
-      <!-- contains the ategories -->
+      <!-- contains the categories -->
       <ul class="nav flex-column mt-3">
       <?php
 
@@ -587,9 +626,33 @@ $( document ).ready(function() {
        <div class="row">
          <?php
             //loop thro different months
-            $months = [
-              "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
-            ];
+            // $months = [
+            //   "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+            // ];
+                
+            // $monthsfr = [
+            //   "JAN", "FEV", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
+            // ];
+
+            // find out which group the id belongs to
+          $get_catgroup_query = "SELECT * FROM category WHERE id = '{$get_cat}'";
+          $get_catgroup = mysqli_query($conn, $get_catgroup_query);
+          
+
+          while($row = mysqli_fetch_assoc($get_catgroup)) {
+            // category table
+            $cat_id = $row['id'];
+            $cat_name = $row['name'];
+            $cat_group = $row['groupe'];
+          }
+
+          if($cat_group == 'structure des prix produits blanc') {
+            $mons = $monsfr;
+            $months = $monthsfr;
+          }  
+
+          
+
             foreach ($months as $month) {
 
               $month_index = array_search($month, $months);
@@ -600,22 +663,39 @@ $( document ).ready(function() {
        <div class="col-md-3">
 
         <?php
-          $mons = [
-            "January", 
-            "February", 
-            "March", 
-            "April", 
-            "May", 
-            "June", 
-            "July", 
-            "August", 
-            "September", 
-            "October", 
-            "November", 
-            "December"
-          ];
+          // $mons = [
+          //   "January", 
+          //   "February", 
+          //   "March", 
+          //   "April", 
+          //   "May", 
+          //   "June", 
+          //   "July", 
+          //   "August", 
+          //   "September", 
+          //   "October", 
+          //   "November", 
+          //   "December"
+          // ];
+
+          // $monsfr = [
+          //   "Janvier", 
+          //   "Fevrier", 
+          //   "Mars", 
+          //   "Avril", 
+          //   "Mai", 
+          //   "Juin", 
+          //   "Jullet", 
+          //   "Aout", 
+          //   "Septembre", 
+          //   "Octobre", 
+          //   "Novembre", 
+          //   "Decembre"
+          // ];
           //echo $mons[$month_index];
           //getting docs
+
+          
           
           $doc_query = "SELECT * FROM document WHERE month = '{$mons[$month_index]}' AND category_ID = '{$get_cat}'";
           $get_doc = mysqli_query($conn, $doc_query);
@@ -642,6 +722,7 @@ $( document ).ready(function() {
               
               <button type="button" onclick="addpdf('<?php echo $month_index; ?>', '<?php echo $get_cat; ?>', '<?php echo $user_id; ?>' )" class="btn monthmodal" data-id="<?=  $month; ?>" data-bs-toggle="modal" data-bs-target="#addpdfmodal">
               <?php echo $month; ?>
+              <?php //echo $monsfr[$month_index]; ?>
               </button>
             </form>
           </div>

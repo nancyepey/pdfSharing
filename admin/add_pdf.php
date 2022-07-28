@@ -15,6 +15,23 @@ session_start();
 $uname =  $_SESSION['name'] ;
 
 
+$monsfr = [
+  "Janvier", 
+  "Fevrier", 
+  "Mars", 
+  "Avril", 
+  "Mai", 
+  "Juin", 
+  "Jullet", 
+  "Aout", 
+  "Septembre", 
+  "Octobre", 
+  "Novembre", 
+  "Decembre"
+];
+
+
+
 // adding pdf into database
 // if(isset($_POST["pdffile"]))
 if(isset($_FILES['sample_image']['name']))
@@ -109,7 +126,12 @@ if(isset($_POST["month_id"]))
     while($row = mysqli_fetch_assoc($get_catss)) {
       // getting row values
       $ct_id = $row['id'];
-      $ct_name = $row['name']; 
+      $ct_name = $row['name'];
+      $ct_groupe = $row['groupe'];
+
+      if($ct_groupe == "structure des prix produits blanc") {
+        $monthName = $monsfr[$_POST["month_id"]];
+      }
 
 
 
