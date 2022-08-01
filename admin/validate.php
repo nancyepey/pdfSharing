@@ -26,10 +26,10 @@ if(isset($_GET['a_id'])){
             //     </script>";
             redirect('./dashboard.php');
         }
-        echo "<script type='text/javascript'>
-                    console.log('inside');
-                    alert('only authorized group of users');
-                </script>";
+        // echo "<script type='text/javascript'>
+        //             console.log('inside');
+        //             alert('only authorized group of users');
+        //         </script>";
     
         // $content_fr = '';
         // $content_en = '';
@@ -72,7 +72,7 @@ if(isset($_GET['a_id'])){
     
             if($new_valid == 1) {
                 // news already validated
-                redirect('./dashboard.php');
+                redirect('./articles.php');
             }
         
             
@@ -97,13 +97,14 @@ if(isset($_POST['validate'])) {
     
 
     // getting the data from form
-    $entitle    = escape($_POST['entitle']);
-    $enshortdesc    = escape($_POST['shortdesc_en']);
-    $long_desc    = escape($_POST['long_desc']);
+    $entitle    = escape($_POST['title']);
+    $enshortdesc    = escape($_POST['short_desc']);
+    $long_desc    = escape($_POST['content']);
     // $statepubselect    = escape($_POST['pubselect']);
-    $frtitre    = escape($_POST['frtitre']);
-    $frshortdesc    = escape($_POST['shortdesc_fr']);
-    $frlong_desc    = escape($_POST['long_desc_fr']);
+    $frtitre    = escape($_POST['titlefr']);
+    $frshortdesc    = escape($_POST['short_descfr']);
+    $frlong_desc    = escape($_POST['contentFR']);
+    // $status    = escape($_POST['status']);
 
     //getting up some validations
     if(empty($entitle)) {
@@ -162,10 +163,10 @@ if(isset($_POST['validate'])) {
                     // 
                     $filename = $_FILES['thumbnail']['name'];
                 } else {
-                    $message[] =  $lang['error uploading file'];
+                    $message[] =  'error uploading file';
                 }
             } else {
-                $message[] =  $lang['error uploading file'];
+                $message[] =  'error uploading file';
             }
         
         } else {
@@ -174,7 +175,7 @@ if(isset($_POST['validate'])) {
         }
 
         
-     
+        // $message[] = "inside";
        
         $validated = 1;
         $translator = $currentuser;
@@ -183,7 +184,7 @@ if(isset($_POST['validate'])) {
         /* query to validate article by putting their new values */
         // $articlevalidate_query = "UPDATE articles SET en_title = '{$entitle}', fr_title = '{$frtitre}', content_en = '{$long_desc}', content_fr = '{$frlong_desc}', short_desc_en = '{$enshortdesc}', short_desc_fr = '{$frshortdesc}',  validated = 1, translator = '{$translator}', validation_date = '{$validated_on}' ";
         
-        $articlevalidate_query = "UPDATE news SET  validated = '{$validated}', translator = '{$translator}', validation_date = '{$validated_on}' WHERE id = '{$vid}' ";
+        $articlevalidate_query = "UPDATE news SET  validated = '{$validated}', translator = '{$translator}', validation_date = '{$validated_on}' WHERE id = '{$val}' ";
 
         // $articlevalidate_query .= " WHERE id = '{$vid}'";
         
@@ -197,6 +198,10 @@ if(isset($_POST['validate'])) {
         //getting the id
         $new_id = mysqli_insert_id($conn);
 
+        if(!isset($lg_switch)) {
+            $lg_switch = "en";
+        }
+
         // show message
         if($validate_new_query){
             // $message[] = "The file ".$file_image. " has been uploaded successfully.";
@@ -205,7 +210,7 @@ if(isset($_POST['validate'])) {
             } elseif($lg_switch == "fr") {
                 $title = $entitle;
             }
-            $message[] = "<span style='text-transform:capitalize; color:#AB7442;'>{$title}</span>  {$lang['Validated Sucessfully']}.";
+            $message[] = "<span style='text-transform:capitalize; color:#AB7442;'>{$title}</span>  Validated Sucessfully.";
             // redirect('./dashboard.php');
             
         }else{
@@ -297,6 +302,19 @@ if(isset($_POST['validate'])) {
 
         <div class="container">
             <div class="row">
+                <!-- error msg -->
+                <?php
+                    if(isset($message)){
+                        foreach($message as $message){
+                            echo '
+                            <div class="message bg-warning mb-3" style="color:white; padding:5px;">
+                                <span>'.$message.'</span>
+                                <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+                            </div>
+                            ';
+                        }
+                    }
+                ?>
                 <div class="col-md-12">
                     <form action="" method="post" enctype="multipart/form-data">
 
@@ -310,7 +328,7 @@ if(isset($_POST['validate'])) {
                                     
                                     
                                     <div class="mb-3">
-                                        <input type="submit" name="add_article" value="Validate" id="saveCfg" class="btn btn-success">
+                                        <input type="submit" name="validate" value="Validate" id="saveCfg" class="btn btn-success">
                                     </div>
                                     
                                     <div class="mb-3">

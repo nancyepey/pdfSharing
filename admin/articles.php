@@ -141,6 +141,11 @@ if(!isset($user_id)){
               </td>
               <td><?= $new_author; ?></td>
               <td><?= $new_date; ?></td>
+              <?php 
+                if($new_valid == 1) {
+
+                // }
+              ?>
               <td>
                 <a href='./viewnew.php?new_id=<?= $new_id; ?>'>Views</a>
               </td>
@@ -156,6 +161,21 @@ if(!isset($user_id)){
                 </button>
 
               </td>
+              
+              <?php 
+              }
+                if($new_valid == 0) {
+                  
+                // }
+              ?>
+              <td>
+                <a href='./validate.php?a_id=<?= $new_id; ?>'>Validate</a>
+              </td>
+              
+              <?php 
+              }
+                
+              ?>
             </tr>
             <?php 
                 $i++;

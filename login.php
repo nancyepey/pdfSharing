@@ -125,15 +125,15 @@ function ifItIsMethod($method) {
 
 
 //this function is to redirect user to any location set in
-function redirect($location) {
+// function redirect($location) {
 
-   // return header("Location:" . $location);
-   //not using return
-   header("Location:" . $location);
-   //we will just exist this
-   exist;
+//    // return header("Location:" . $location);
+//    //not using return
+//    header("Location:" . $location);
+//    //we will just exist this
+//    exist;
 
-}
+// }
    
 
 if(ifItIsMethod('post')) {
