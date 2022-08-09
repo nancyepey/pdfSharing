@@ -161,9 +161,50 @@ if(!isset($user_id)){
 
 }
 
-if(isset($_POST['edituserSubmit'])) {
-  
+
+// if(isset($_POST['delsubmit'])) {
+//     // 
+//     $query = "DELETE FROM users WHERE id = '".$_POST["user_id"]."'";  
+//     $result = mysqli_query($conn, $query); 
+//     if ($result) {
+//       $message[] = "User deleted successfully";
+//     } else {
+//       $message[] = "Error deleting User: ";
+//       // echo "Error deleting User: " . mysqli_error($conn);
+//     }
+// }
+
+
+if(isset($_POST['delsubmit'])) {
+  // 
+  if(isset($_POST['userID'])) {
+
+    $query = "DELETE FROM users WHERE id = '".$_POST['userID']."'";  
+    $result = mysqli_query($conn, $query); 
+    if ($result) {
+      $message[] = "User deleted successfully";
+    } else {
+      $message[] = "Error deleting User ";
+      // echo "Error deleting User: " . mysqli_error($conn);
+    }
+  } else {
+    $message[] = "No user ID found ";
+    // echo "Error deleting User: " . mysqli_error($conn);
+  }
 }
+
+// if(isset($_POST['del_id'])) {
+//   // 
+//   $query = "DELETE FROM users WHERE id = '".$_POST["user_id"]."'";  
+//   $result = mysqli_query($conn, $query); 
+//   if ($result) {
+//     echo "User deleted successfully";
+//   } else {
+//     echo "Error deleting User: ";
+//     // echo "Error deleting User: " . mysqli_error($conn);
+//   }
+// }
+
 
 
 ?>
@@ -204,8 +245,44 @@ if(isset($_POST['edituserSubmit'])) {
         }});
 
       }
+      function deluser(id_user) {
+       //  
+       console.log( "delete modal clicked" );
+        
+      
+      console.log(id_user);
+      $.ajax({url: "deluser.php",
+        method:'post',
+        data:{user_id:id_user},
+          success: function(result){
+          $(".delbody").html(result);
+        }});
 
+      }
 
+       // get data from pdf modal
+      $("#savepdf").click(function() {
+        console.log( "savepdf modal clicked" );
+      });
+
+    </script>
+    <script>
+      function delete(id_user) {
+       //  
+       console.log( "delete submit clicked" );
+       
+        
+      
+      console.log(id_user);
+      $.ajax({url: "users.php",
+        method:'post',
+        data:{del_id:id_user},
+          success: function(result){
+            console.log(result);
+          $(".message").html(result);
+        }});
+
+      }
     </script>
     
 
@@ -448,7 +525,7 @@ if(isset($_POST['edituserSubmit'])) {
                 </button>
               </td>
               <td>
-                  <button type="button"  class="btn btn-danger " value="<?php echo $user_id; ?>" data-bs-toggle="modal" data-bs-target="#deleteusermodal">
+                  <button type="button" onclick="deluser('<?php echo $user_id; ?>')"   class="btn btn-danger " value="<?php echo $user_id; ?>" data-bs-toggle="modal" data-bs-target="#deleteusermodal">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
               </td>
@@ -535,22 +612,25 @@ if(isset($_POST['edituserSubmit'])) {
             <div class="modal-dialog">
                 <div class="modal-content">
                     <!-- form -->
-                    <form action="post">
+                    <form action="" method="post">
                     <div class="modal-header">
                     <h5 class="modal-title" id="deleteusermodalLabel">Delete <?= $user_uname; ?></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body delbody">
                     
-                        <div class="mb-3">
-                            <label for="uname" class="form-label">Are you show you want to delete user "<?= $user_uname; ?>"</label>
-                        </div>
+                        <!-- <div class="mb-3">
+                            <label for="uname" class="form-label">Are you show you want to delete user "<?php // $user_uname; ?>"</label>
+                        </div> -->
+                        <!-- <input type="text" name="userID" value=""> -->
                     
                     </div>
                     <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <!-- <button type="button" onclick="delete('<?php //echo $user_id; ?>')" class="btn btn-danger" id="del">Delete User</button> -->
                     
-                    <input type="submit" value="Delete User" class="btn btn-danger" name="submit">
+                    <!-- <input type="submit" value="Delete User" class="btn btn-danger" name="delsubmit"> -->
+                    <input type="submit" onclick="delete('<?php echo $user_id; ?>')" value="Delete User" class="btn btn-danger" name="delsubmit">
                     </div>
 
                     </form>
